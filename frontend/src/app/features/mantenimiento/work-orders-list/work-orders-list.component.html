@@ -1,0 +1,146 @@
+<div class="p-4 md:p-6 lg:p-8 bg-slate-950 min-h-screen text-slate-100">
+    <!-- Modern Header -->
+    <div
+        class="glass-card rounded-[2.5rem] p-8 mb-10 border border-white/5 shadow-2xl animate-slide-up relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px]"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-600/10 rounded-full blur-[80px]"></div>
+
+        <div class="relative z-10 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8">
+            <div class="space-y-2">
+                <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight flex items-center gap-4">
+                    <div
+                        class="w-2 h-12 bg-gradient-to-b from-blue-500 to-blue-700 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+                    </div>
+                    Gestión de Mantenimiento
+                </h1>
+                <p class="text-slate-400 text-sm md:text-base font-medium pl-6 border-l border-slate-800/50">
+                    Supervisión de Órdenes de Trabajo y Estado Operativo de Activos.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-6">
+                <div class="glass-card px-6 py-4 rounded-3xl border border-white/5 flex flex-col items-center">
+                    <span class="text-2xl font-black text-white">{{ orders.length }}</span>
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Total OTs</span>
+                </div>
+                <div
+                    class="glass-card px-6 py-4 rounded-3xl border border-amber-500/20 bg-amber-500/5 flex flex-col items-center">
+                    <span class="text-2xl font-black text-amber-500">{{ pendingCount }}</span>
+                    <span class="text-[9px] font-black text-amber-500/50 uppercase tracking-widest">Pendientes</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-col lg:flex-row gap-6 mb-10 animate-slide-up" style="animation-delay: 0.1s">
+        <div class="relative flex-1 group">
+            <div
+                class="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                <lucide-icon [name]="Search" [size]="20"></lucide-icon>
+            </div>
+            <input type="text" placeholder="Buscar por número, equipo o sitio..." (input)="onSearch($event)"
+                class="w-full bg-slate-900/40 border border-white/5 rounded-[1.8rem] py-5 pl-16 pr-8 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600/30 focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-xl">
+        </div>
+
+        <div class="w-full lg:w-72 relative group">
+            <select (change)="filterByStatus($event)"
+                class="w-full bg-slate-900/40 border border-white/5 rounded-[1.8rem] py-5 px-8 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/30 transition-all appearance-none cursor-pointer backdrop-blur-xl font-bold text-sm tracking-wide">
+                <option value="">Filtro por Estado</option>
+                <option value="ABIERTA">Abierta</option>
+                <option value="EN_PROGRESO">En Progreso</option>
+                <option value="ESPERANDO_REPUESTO">Esperando Repuesto</option>
+                <option value="CERRADA">Cerrada</option>
+            </select>
+            <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-600">
+                <lucide-icon [name]="ChevronDown" [size]="18"></lucide-icon>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-slide-up" style="animation-delay: 0.2s">
+        <div *ngFor="let order of filteredOrders"
+            class="glass-card rounded-[2.5rem] p-8 shadow-2xl hover:border-blue-500/40 transition-all flex flex-col justify-between group relative overflow-hidden h-full border border-white/5">
+
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-2xl -mr-16 -mt-16"></div>
+
+            <div>
+                <div class="flex justify-between items-center mb-6 border-b border-white/[0.03] pb-4">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-1">Orden de
+                            Trabajo</span>
+                        <span class="text-xl font-black text-white">{{ order.numero }}</span>
+                    </div>
+                    <span class="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border"
+                        [ngClass]="{
+                        'bg-red-500/10 text-red-500 border-red-500/20': order.prioridad === 'ALTA',
+                        'bg-amber-500/10 text-amber-500 border-amber-500/20': order.prioridad === 'MEDIA',
+                        'bg-blue-500/10 text-blue-500 border-blue-500/20': order.prioridad === 'BAJA'
+                    }">
+                        {{ order.prioridad }}
+                    </span>
+                </div>
+
+                <div class="space-y-6 mb-8">
+                    <div class="flex flex-col gap-1.5">
+                        <h3 class="text-lg font-black text-white hover:text-blue-400 transition-colors cursor-pointer">
+                            {{ order.equipo?.marca }} {{ order.equipo?.modelo }}</h3>
+                        <div class="flex items-center gap-2 text-slate-500">
+                            <lucide-icon [name]="MapPin" [size]="14"></lucide-icon>
+                            <span class="text-xs font-bold uppercase tracking-tighter">{{ order.equipo?.vhf?.aeropuerto
+                                }} — {{ order.equipo?.vhf?.sitio }}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <p class="text-xs text-slate-400 leading-relaxed italic line-clamp-3">"{{ order.descripcion }}"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <div class="flex items-center justify-between pt-6 border-t border-white/[0.03]">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full shadow-[0_0_8px]" [ngClass]="{
+                            'bg-emerald-500 shadow-emerald-500/50': order.estado === 'CERRADA',
+                            'bg-amber-500 shadow-amber-500/50': order.estado === 'ABIERTA',
+                            'bg-blue-500 shadow-blue-500/50': order.estado === 'EN_PROGRESO',
+                            'bg-purple-500 shadow-purple-500/50': order.estado === 'ESPERANDO_REPUESTO'
+                        }"></div>
+                        <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">{{ order.estado
+                            }}</span>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button (click)="exportPdf(order)"
+                            class="p-3 bg-white/5 hover:bg-red-500/10 text-slate-400 hover:text-red-400 rounded-2xl transition-all"
+                            title="Exportar PDF">
+                            <lucide-icon [name]="FileText" [size]="18"></lucide-icon>
+                        </button>
+                        <button (click)="viewDetails(order)"
+                            class="p-3 bg-white/5 hover:bg-blue-500/10 text-slate-400 hover:text-blue-400 rounded-2xl transition-all"
+                            title="Detalles">
+                            <lucide-icon [name]="Eye" [size]="18"></lucide-icon>
+                        </button>
+                        <button *ngIf="order.estado !== 'CERRADA'" (click)="completeOrder(order)"
+                            class="p-3 bg-white/5 hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-400 rounded-2xl transition-all"
+                            title="Cerrar OT">
+                            <lucide-icon [name]="CheckCircle" [size]="18"></lucide-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredOrders.length === 0" class="col-span-full py-40 glass-card rounded-[3rem] text-center mt-8">
+        <div class="flex flex-col items-center gap-4">
+            <lucide-icon [name]="Search" [size]="48" class="text-slate-800"></lucide-icon>
+            <p class="text-slate-600 font-black uppercase tracking-[0.2em] text-xs">No hay órdenes de trabajo activas
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+
+export enum Sector {
+    CNSE = 'CNSE',
+    COMUNICACIONES = 'COMUNICACIONES',
+    NAVEGACION = 'NAVEGACION',
+    VIGILANCIA = 'VIGILANCIA',
+    ENERGIA = 'ENERGIA',
+}
+
+export enum EstadoEquipo {
+    OK = 'OK',
+    NOVEDAD = 'NOVEDAD',
+    FUERA_SERVICIO = 'FUERA_SERVICIO',
+}
+
+export enum Prioridad {
+    BAJA = 'BAJA',
+    MEDIA = 'MEDIA',
+    ALTA = 'ALTA',
+    CRITICA = 'CRITICA',
+}
+
+export enum EstadoOT {
+    ABIERTA = 'ABIERTA',
+    EN_PROGRESO = 'EN_PROGRESO',
+    ESPERANDO_REPUESTO = 'ESPERANDO_REPUESTO',
+    VERIFICADA = 'VERIFICADA',
+    CERRADA = 'CERRADA',
+    CANCELADA = 'CANCELADA',
+}
+
+export enum Role {
+    TECNICO = 'TECNICO',
+    JEFE_COORDINADOR = 'JEFE_COORDINADOR',
+    CNS_NACIONAL = 'CNS_NACIONAL',
+    ADMIN = 'ADMIN',
+}
+
+export enum TipoChatRoom {
+    GENERAL = 'GENERAL',
+    TECNICO = 'TECNICO',
+    REGIONAL = 'REGIONAL',
+    PRIVADO = 'PRIVADO',
+    AEROPUERTO = 'AEROPUERTO',
+    FIR = 'FIR',
+    SECTOR = 'SECTOR',
+    EQUIPO = 'EQUIPO',
+}

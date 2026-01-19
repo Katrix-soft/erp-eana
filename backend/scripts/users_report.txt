@@ -1,0 +1,132 @@
+Usuarios encontrados (CNS_NACIONAL o sin puesto definido):
+-------------------------------------------------------
+ID: 4
+Email: cns.nacional@eana.com.ar
+Rol: CNS_NACIONAL
+Puesto: Supervisor
+---
+ID: 5
+Email: admin.test@eana.com.ar
+Rol: ADMIN
+Puesto: SIN PUESTO
+---
+ID: 284
+Email: chasenauer@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 295
+Email: ddiaz@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 296
+Email: gsalvarrey@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 297
+Email: mccorrea@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 298
+Email: aeguevara@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 299
+Email: guflores@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 300
+Email: lfernandez@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 301
+Email: jorbegozo@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 302
+Email: mguerrero@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 303
+Email: aterreni@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 304
+Email: fgonzalez@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 305
+Email: rsananes@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 306
+Email: rluc@eana.com.ar
+Rol: ADMIN
+Puesto: SIN PUESTO
+---
+ID: 307
+Email: nduquez@eana.com.ar
+Rol: ADMIN
+Puesto: SIN PUESTO
+---
+ID: 308
+Email: vchambers@eana.com.ar
+Rol: ADMIN
+Puesto: SIN PUESTO
+---
+ID: 309
+Email: mareinoso@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 310
+Email: okiefer@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 311
+Email: fsanchez@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 312
+Email: mlonghini@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 313
+Email: lcobo@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 314
+Email: hpequeux@eana.com.ar
+Rol: JEFE_COORDINADOR
+Puesto: SIN PUESTO
+---
+ID: 315
+Email: dferreyra@eana.com.ar
+Rol: TECNICO
+Puesto: SIN PUESTO
+---
+ID: 318
+Email: admin@eana.com
+Rol: ADMIN
+Puesto: SIN PUESTO
+---
+ID: 317
+Email: admin@eana.com.ar
+Rol: ADMIN
+Puesto: SIN PUESTO
+---

@@ -1,0 +1,256 @@
+<div class="foro-container">
+    <!-- Header -->
+    <div class="foro-header">
+        <div class="header-content">
+            <div class="header-left">
+                <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <div>
+                    <h1 class="header-title">Foro Técnico</h1>
+                    <p class="header-subtitle">Comparte experiencias y soluciones con la comunidad CNS</p>
+                </div>
+            </div>
+            <button class="btn-primary" (click)="openNewPostModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nuevo Post
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <label>Estado:</label>
+            <select [(ngModel)]="filters.resuelto" (change)="applyFilters()">
+                <option [ngValue]="undefined">Todos</option>
+                <option [ngValue]="false">Pendientes</option>
+                <option [ngValue]="true">Resueltos</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Sector:</label>
+            <select [(ngModel)]="filters.sector" (change)="applyFilters()">
+                <option [ngValue]="undefined">Todos</option>
+                <option value="CNSE">CNSE</option>
+                <option value="COMUNICACIONES">Comunicaciones</option>
+                <option value="NAVEGACION">Navegación</option>
+                <option value="VIGILANCIA">Vigilancia</option>
+                <option value="ENERGIA">Energía</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Posts List -->
+    <div class="posts-grid" *ngIf="!selectedPost">
+        <div *ngIf="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Cargando posts...</p>
+        </div>
+
+        <div *ngIf="!loading && posts.length === 0" class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <h3>No hay posts aún</h3>
+            <p>Sé el primero en compartir una consulta o experiencia</p>
+        </div>
+
+        <div *ngFor="let post of posts" class="post-card" (click)="viewPost(post)">
+            <div class="post-header">
+                <div class="post-author">
+                    <div class="author-avatar">
+                        {{ getAuthorName(post).charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="author-info">
+                        <span class="author-name">{{ getAuthorName(post) }}</span>
+                        <span class="post-date">{{ post.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                </div>
+                <span class="post-status" [class.resolved]="post.resuelto">
+                    {{ post.resuelto ? 'Resuelto' : 'Pendiente' }}
+                </span>
+            </div>
+
+            <h3 class="post-title">{{ post.titulo }}</h3>
+            <p class="post-preview">{{ post.contenido.substring(0, 150) }}{{ post.contenido.length > 150 ? '...' : '' }}
+            </p>
+
+            <div class="post-footer">
+                <div class="post-stats">
+                    <span class="stat">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        {{ post.vistas }}
+                    </span>
+                    <span class="stat">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        {{ post._count?.comentarios || 0 }}
+                    </span>
+                </div>
+                <span class="post-sector" *ngIf="post.sector">{{ post.sector }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Detail -->
+    <div class="post-detail" *ngIf="selectedPost">
+        <button class="btn-back" (click)="closePostDetail()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Volver
+        </button>
+
+        <div class="detail-header">
+            <div class="detail-author">
+                <div class="author-avatar large">
+                    {{ getAuthorName(selectedPost).charAt(0).toUpperCase() }}
+                </div>
+                <div class="author-info">
+                    <span class="author-name">{{ getAuthorName(selectedPost) }}</span>
+                    <span class="post-date">{{ selectedPost.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+            </div>
+            <div class="detail-actions">
+                <span class="post-status" [class.resolved]="selectedPost.resuelto">
+                    {{ selectedPost.resuelto ? 'Resuelto' : 'Pendiente' }}
+                </span>
+                <ng-container *ngIf="canManagePost(selectedPost)">
+                    <button *ngIf="!selectedPost.resuelto" class="btn-resolve" (click)="markAsResolved(selectedPost)">
+                        Resolver
+                    </button>
+                    <button class="btn-delete-ghost" (click)="deletePost(selectedPost)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+
+        <h2 class="detail-title">{{ selectedPost.titulo }}</h2>
+        <div class="detail-content">{{ selectedPost.contenido }}</div>
+
+        <div class="detail-meta">
+            <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                {{ selectedPost.vistas }} vistas
+            </span>
+            <span class="meta-item" *ngIf="selectedPost.sector">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                </svg>
+                {{ selectedPost.sector }}
+            </span>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h3 class="comments-title">
+                Comentarios ({{ selectedPost.comentarios?.length || 0 }})
+            </h3>
+
+            <div class="comment-form">
+                <textarea [(ngModel)]="newComment" placeholder="Escribe tu comentario..." rows="3"></textarea>
+                <button class="btn-primary" (click)="addComment()" [disabled]="!newComment.trim()">
+                    Comentar
+                </button>
+            </div>
+
+            <div class="comments-list">
+                <div *ngFor="let comment of selectedPost.comentarios" class="comment">
+                    <div class="comment-author">
+                        <div class="author-avatar small">
+                            {{ comment.autor.personal ? comment.autor.personal.nombre.charAt(0).toUpperCase() :
+                            comment.autor.email.charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="author-info">
+                            <span class="author-name">
+                                {{ comment.autor.personal ? comment.autor.personal.nombre + ' ' +
+                                comment.autor.personal.apellido : comment.autor.email }}
+                            </span>
+                            <span class="comment-date">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                        </div>
+                    </div>
+                    <p class="comment-content">{{ comment.contenido }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Post Modal -->
+    <div class="modal-overlay" *ngIf="showNewPostModal" (click)="closeNewPostModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Nuevo Post</h2>
+                <button class="btn-close" (click)="closeNewPostModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" [(ngModel)]="newPost.titulo" placeholder="Título del post">
+                </div>
+
+                <div class="form-group">
+                    <label>Contenido</label>
+                    <textarea [(ngModel)]="newPost.contenido" rows="6"
+                        placeholder="Describe tu consulta o experiencia..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Sector (opcional)</label>
+                    <select [(ngModel)]="newPost.sector">
+                        <option [ngValue]="undefined">Seleccionar...</option>
+                        <option value="CNSE">CNSE</option>
+                        <option value="COMUNICACIONES">Comunicaciones</option>
+                        <option value="NAVEGACION">Navegación</option>
+                        <option value="VIGILANCIA">Vigilancia</option>
+                        <option value="ENERGIA">Energía</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeNewPostModal()">Cancelar</button>
+                <button class="btn-primary" (click)="createPost()"
+                    [disabled]="!newPost.titulo || !newPost.contenido || loading">
+                    {{ loading ? 'Creando...' : 'Publicar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

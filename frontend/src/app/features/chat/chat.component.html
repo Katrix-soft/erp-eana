@@ -1,0 +1,259 @@
+<div class="discord-container">
+    <!-- Server/Guilds Sidebar (Optional wrapper if we had multiple servers) -->
+    <!-- For simplicity, we just have rooms sidebar as "channels" -->
+
+    <!-- Mobile Header -->
+    <div class="mobile-header lg:hidden">
+        <button class="mobile-menu-btn" (click)="toggleSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+        <h3>Canales</h3>
+    </div>
+
+    <!-- Channels Sidebar -->
+    <div class="channels-sidebar" [class.show-mobile]="sidebarOpen" [class.collapsed]="isSidebarCollapsed">
+        <div class="sidebar-header">
+            <h3 *ngIf="!isSidebarCollapsed">Canales</h3>
+            <button class="close-sidebar lg:hidden" (click)="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <!-- Desktop Collapse Button -->
+            <button class="desktop-collapse-btn hidden lg:flex" (click)="toggleDesktopSidebar()" title="Colapsar menú">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5"></path>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+        </div>
+
+        <div class="channels-list" *ngIf="!isSidebarCollapsed">
+            <div class="channel-category">CANALES DE TEXTO</div>
+
+            <div *ngFor="let room of rooms" class="channel-item" [class.active]="selectedRoom?.id === room.id"
+                (click)="selectRoom(room); toggleSidebar()">
+                <svg class="hashtag-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18" />
+                </svg>
+                <span class="channel-name">{{ room.nombre | lowercase }}</span>
+                <div class="unread-badge" *ngIf="(room._count?.mensajes || 0) > 0">
+                    {{ room._count?.mensajes }}
+                </div>
+            </div>
+        </div>
+
+        <div class="user-panel" *ngIf="!isSidebarCollapsed">
+            <div class="user-avatar" [style.background-color]="'#5865F2'">
+                {{ currentUserInitial }}
+            </div>
+            <div class="user-info">
+                <div class="username">{{ currentUserEmailPrefix }}</div>
+                <div class="user-discriminator">#{{ authService.userValue?.id }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+        <ng-container *ngIf="selectedRoom; else noRoomSelected">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn lg:hidden mr-2" (click)="toggleSidebar()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <!-- Desktop Expand Button -->
+                    <button class="mobile-menu-btn hidden lg:flex mr-2" *ngIf="isSidebarCollapsed"
+                        (click)="toggleDesktopSidebar()" title="Expandir menú">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <svg class="hashtag-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18" />
+                    </svg>
+                    <h3>{{ selectedRoom.nombre | lowercase }}</h3>
+                    <span class="topic" *ngIf="selectedRoom.descripcion">{{ selectedRoom.descripcion }}</span>
+                </div>
+                <div class="header-right">
+                    <!-- Additional header icons/actions could go here -->
+                </div>
+            </div>
+
+            <!-- Messages List -->
+            <div class="messages-wrapper">
+                <div class="messages-container" #scrollContainer>
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18" />
+                            </svg>
+                        </div>
+                        <h2>Bienvenido a #{{ selectedRoom.nombre | lowercase }}</h2>
+                        <p>Este es el comienzo del canal #{{ selectedRoom.nombre | lowercase }}.</p>
+                    </div>
+
+                    <div *ngFor="let message of messages; let i = index" class="message-group"
+                        [class.has-separator]="shouldShowSeparator(i)">
+                        <div class="date-separator" *ngIf="shouldShowSeparator(i)">
+                            <span>{{ message.createdAt | date:'dd/MM/yyyy' }}</span>
+                        </div>
+
+                        <div class="message-item" [class.compact]="isSameUser(i)">
+                            <div class="message-avatar" *ngIf="!isSameUser(i)">
+                                <div class="avatar-img" [style.background-color]="getUserColor(message.userId)">
+                                    {{ getAuthorInitial(message) }}
+                                </div>
+                            </div>
+
+                            <div class="message-content-wrapper">
+                                <div class="message-header" *ngIf="!isSameUser(i)">
+                                    <span class="message-username" [style.color]="getUserColor(message.userId)">
+                                        {{ getAuthorName(message) }}
+                                    </span>
+                                    <span class="message-timestamp">
+                                        {{ message.createdAt | date:'HH:mm' }}
+                                    </span>
+                                </div>
+
+                                <div class="message-text">
+                                    {{ message.mensaje }}
+                                    <span class="compact-timestamp" *ngIf="isSameUser(i)">
+                                        {{ message.createdAt | date:'HH:mm' }}
+                                    </span>
+                                </div>
+
+                                <!-- Attachments -->
+                                <div class="message-attachments"
+                                    *ngIf="message.imagenes && message.imagenes.length > 0">
+                                    <div *ngFor="let url of message.imagenes" class="attachment-item">
+                                        <img *ngIf="isUrlImage(url)" [src]="url" alt="Adjunto"
+                                            (click)="openImageModal(url)">
+                                        <video *ngIf="isUrlVideo(url)" [src]="url" controls
+                                            style="max-width: 400px; max-height: 300px; border-radius: 4px;"></video>
+                                        <a *ngIf="!isUrlImage(url) && !isUrlVideo(url)" [href]="url" target="_blank"
+                                            class="generic-file"
+                                            style="text-decoration: none; display: flex; align-items: center; padding: 10px; border-radius: 4px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                style="margin-right: 8px;">
+                                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z">
+                                                </path>
+                                                <polyline points="13 2 13 9 20 9"></polyline>
+                                            </svg>
+                                            Abrir Archivo
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="typing-indicator" *ngIf="typingUsers.length > 0">
+                    <span class="dots">
+                        <span>.</span><span>.</span><span>.</span>
+                    </span>
+                    <strong>{{ getTypingText() }}</strong> está escribiendo...
+                </div>
+
+                <!-- File Previews -->
+                <div class="file-previews" *ngIf="pendingFiles.length > 0">
+                    <div *ngFor="let file of pendingFiles; let i = index" class="file-preview-item">
+                        <div class="preview-thumb">
+                            <img *ngIf="isImage(file)" [src]="file.previewUrl" alt="Preview">
+                            <div *ngIf="!isImage(file)" class="file-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                    <polyline points="13 2 13 9 20 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="filename">{{ file.file.name }}</span>
+                        <button class="remove-file" (click)="removePendingFile(i)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger" *ngIf="connectionStatus === 'disconnected'"
+                    style="position: absolute; bottom: 100%; left: 16px; right: 16px; background: #ef4444; color: white; padding: 8px; border-radius: 8px; margin-bottom: 8px; z-index: 100;">
+                    Desconectado del servidor de chat. Reintentando...
+                </div>
+
+                <div class="input-wrapper">
+                    <button class="attach-btn" (click)="fileInput.click()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+                        </svg>
+                    </button>
+                    <input type="file" #fileInput hidden multiple (change)="onFileSelected($event)">
+
+                    <textarea #messageInput [(ngModel)]="newMessage" (keydown.enter)="onEnterKey($event)"
+                        placeholder="Enviar mensaje a #{{ selectedRoom.nombre | lowercase }}" rows="1"
+                        (input)="onInput()">
+                    </textarea>
+
+                    <button class="send-btn" (click)="sendMessage()"
+                        [disabled]="!newMessage.trim() && pendingFiles.length === 0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="typing-help" *ngIf="false">
+                    <strong>Shift + Enter</strong> para nueva línea
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #noRoomSelected>
+            <div class="no-room-state">
+                <div class="wumpus-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none"
+                        stroke="#dcddde" stroke-width="1">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h3>¡Bienvenido al Chat EANA!</h3>
+                <p>Selecciona un canal de la izquierda para comenzar a chatear.</p>
+            </div>
+        </ng-template>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="image-modal" *ngIf="zoomedImage" (click)="closeImageModal()">
+    <img [src]="zoomedImage" (click)="$event.stopPropagation()">
+</div>

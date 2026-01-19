@@ -1,0 +1,91 @@
+<div *ngIf="user$ | async as user" class="flex h-screen min-h-screen bg-slate-950 overflow-hidden text-slate-200">
+    <!-- Mobile Sidebar Overlay -->
+    <div *ngIf="isSidebarOpen" class="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm touch-none"
+        (click)="closeSidebar()">
+    </div>
+
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out lg:relative lg:h-full lg:translate-x-0"
+        [class.translate-x-0]="isSidebarOpen" [class.-translate-x-full]="!isSidebarOpen">
+        <app-sidebar (closeSidebar)="closeSidebar()"></app-sidebar>
+    </div>
+
+    <main
+        class="flex-1 flex flex-col overflow-hidden relative w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
+        <!-- Header -->
+        <header
+            class="bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 h-16 flex items-center justify-between px-4 md:px-8 shadow-lg z-50">
+            <div class="flex items-center gap-4">
+                <button (click)="toggleSidebar()"
+                    class="lg:hidden p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                    <lucide-icon [name]="Menu" [size]="24"></lucide-icon>
+                </button>
+                <span class="lg:hidden font-bold text-white tracking-tight">CNS/EANA</span>
+
+                <!-- Breadcrumbs -->
+                <div *ngIf="user.context?.fir || user.context?.aeropuerto"
+                    class="hidden md:flex items-center gap-3 text-sm ml-4 bg-slate-800/30 px-5 py-2.5 rounded-2xl border border-white/5 backdrop-blur-md shadow-inner">
+                    <ng-container *ngIf="user.context.fir">
+                        <div class="flex items-center gap-2">
+                            <lucide-icon [name]="Globe" [size]="14" class="text-blue-500/70"></lucide-icon>
+                            <span class="font-black text-blue-400 tracking-wider">{{ user.context.fir }}</span>
+                        </div>
+                    </ng-container>
+
+                    <lucide-icon *ngIf="user.context.fir && user.context.aeropuerto" [name]="ChevronRight" [size]="14"
+                        class="text-slate-700 mx-1"></lucide-icon>
+
+                    <ng-container *ngIf="user.context.aeropuerto">
+                        <div class="flex items-center gap-2">
+                            <lucide-icon [name]="Plane" [size]="14" class="text-slate-500"></lucide-icon>
+                            <div class="flex flex-col -space-y-1">
+                                <span
+                                    class="text-[8px] font-black uppercase text-slate-500 tracking-tighter">Aeropuerto</span>
+                                <span class="font-bold text-slate-100">{{ user.context.aeropuerto }}</span>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="ml-auto flex items-center gap-4">
+                <!-- NotificationDropdown -->
+                <app-notification-dropdown></app-notification-dropdown>
+
+                <a routerLink="/profile"
+                    class="flex items-center gap-3 pl-4 border-l border-slate-800 hover:bg-slate-800/50 transition-colors py-1 pr-2 rounded-r-lg group">
+                    <div
+                        class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-xs ring-2 ring-blue-500/20 group-hover:ring-blue-500/40 transition-all">
+                        {{ user.context?.nombre ? (user.context.nombre.charAt(0) +
+                        user.context.apellido.charAt(0)).toUpperCase() : 'US' }}
+                    </div>
+                    <div class="hidden md:flex flex-col">
+                        <span
+                            class="text-xs font-bold text-blue-400 group-hover:text-blue-300 transition-colors">CNS/EANA</span>
+                        <span
+                            class="text-[10px] text-slate-500 font-medium truncate max-w-[120px] group-hover:text-slate-400 transition-colors">
+                            {{ user.context?.nombre ? (user.context.nombre + ' ' + user.context.apellido) : user.email
+                            }}
+                        </span>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-auto scroll-smooth" [class.p-4]="!isFullWidth" [class.md:p-8]="!isFullWidth"
+            [class.pb-20]="!isFullWidth" [class.p-0]="isFullWidth">
+            <div [class.max-w-7xl]="!isFullWidth" [class.mx-auto]="!isFullWidth" [class.h-full]="isFullWidth">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Loading Overlay -->
+<div *ngIf="loading$ | async"
+    class="flex h-screen w-full items-center justify-center bg-slate-950 text-white fixed inset-0 z-[100]">
+    <div class="flex flex-col items-center gap-4">
+        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-slate-400 font-medium animate-pulse">Cargando sistema...</p>
+    </div>
+</div>

@@ -1,0 +1,303 @@
+<div class="space-y-8 animate-in fade-in duration-500 pb-10 p-4 md:p-6" *ngIf="user$ | async as user">
+
+  <!-- Loading State -->
+  <div *ngIf="loading && !stats" class="flex flex-col items-center justify-center py-40">
+    <lucide-icon [name]="RefreshCw" class="text-blue-500 animate-spin mb-4" [size]="48"></lucide-icon>
+    <p class="text-slate-400 font-medium animate-pulse">Compilando tablero estratégico...</p>
+  </div>
+
+  <ng-container *ngIf="stats">
+    <!-- Header -->
+    <div
+      class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5">
+      <div class="flex items-center gap-4">
+        <div class="p-3 bg-blue-600/20 rounded-2xl text-blue-400 shadow-inner">
+          <lucide-icon [name]="LayoutDashboard" [size]="32"></lucide-icon>
+        </div>
+        <div>
+          <h1 class="text-3xl font-black text-white tracking-tight">Panel de Control</h1>
+          <p class="text-slate-400 font-medium">
+            {{ isAdmin ? 'Resumen General del Sistema CNS/EANA' : 'Bienvenido ' + (user.context?.nombre || '') + ' - ' +
+            (stats.context?.aeropuerto || stats.context?.fir || 'Sector Asignado') }}
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button (click)="loadData()"
+          class="p-2.5 hover:bg-white/5 rounded-xl text-slate-400 transition-all border border-transparent hover:border-white/10 active:scale-95"
+          title="Actualizar">
+          <lucide-icon [name]="RefreshCw" [size]="20" [class.animate-spin]="loading"></lucide-icon>
+        </button>
+        <div
+          class="text-[10px] font-black tracking-widest uppercase text-slate-500 bg-slate-950/50 px-4 py-2 rounded-xl border border-white/5">
+          Sync: {{ today | date:'HH:mm:ss' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Global Progress / Availability -->
+    <div
+      class="bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-white/5 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-8 shadow-2xl">
+      <div class="relative w-32 h-32 flex items-center justify-center">
+        <svg class="w-full h-full transform -rotate-90">
+          <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent"
+            class="text-white/5" />
+          <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent"
+            class="text-blue-500 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+            [attr.stroke-dasharray]="364.4"
+            [attr.stroke-dashoffset]="364.4 - (364.4 * (stats.global.operational / stats.global.total))" />
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-3xl font-black text-white">{{ Math.round((stats.global.operational / stats.global.total) *
+            100) }}%</span>
+          <span class="text-[8px] font-black text-slate-500 uppercase tracking-tighter">Operativo</span>
+        </div>
+      </div>
+      <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="space-y-1">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Equipamiento Total</p>
+          <p class="text-3xl font-black text-white">{{ stats.global.total }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-xs font-bold text-emerald-500/70 uppercase tracking-widest">Sistemas OK</p>
+          <p class="text-3xl font-black text-emerald-400">{{ stats.global.operational }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-xs font-bold text-yellow-500/70 uppercase tracking-widest">Novedades</p>
+          <p class="text-3xl font-black text-yellow-400">{{ stats.global.warning }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-xs font-bold text-red-500/70 uppercase tracking-widest">Fuera de Servicio</p>
+          <p class="text-3xl font-black text-red-500">{{ stats.global.danger }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Systems Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <!-- Comms -->
+      <div routerLink="/comunicaciones"
+        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-blue-500/50 transition-all cursor-pointer">
+        <div
+          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-blue-500/10 blur-2xl group-hover:bg-blue-500/20 transition-all">
+        </div>
+        <div class="relative z-10 flex flex-col h-full">
+          <div
+            class="p-3 rounded-xl bg-blue-500/10 text-blue-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/5">
+            <lucide-icon [name]="Radio" [size]="24"></lucide-icon>
+          </div>
+          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Comunicaciones</h3>
+          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.comms.total }} <span
+              class="text-sm font-medium text-slate-500">Equipos</span></p>
+          <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.comms.operational }}
+              OK</span>
+            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.comms.danger }} FS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div routerLink="/navegacion"
+        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-emerald-500/50 transition-all cursor-pointer">
+        <div
+          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-emerald-500/10 blur-2xl group-hover:bg-emerald-500/20 transition-all">
+        </div>
+        <div class="relative z-10 flex flex-col h-full">
+          <div
+            class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/5">
+            <lucide-icon [name]="Server" [size]="24"></lucide-icon>
+          </div>
+          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Navegación</h3>
+          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.nav.total }} <span
+              class="text-sm font-medium text-slate-500">Facilidades</span></p>
+          <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.nav.operational }}
+              OK</span>
+            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.nav.danger }} FS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vig -->
+      <div routerLink="/vigilancia"
+        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-violet-500/50 transition-all cursor-pointer">
+        <div
+          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-violet-500/10 blur-2xl group-hover:bg-violet-500/20 transition-all">
+        </div>
+        <div class="relative z-10 flex flex-col h-full">
+          <div
+            class="p-3 rounded-xl bg-violet-500/10 text-violet-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-violet-500/5">
+            <lucide-icon [name]="Activity" [size]="24"></lucide-icon>
+          </div>
+          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Vigilancia</h3>
+          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.vig.total }} <span
+              class="text-sm font-medium text-slate-500">Sistemas</span></p>
+          <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.vig.operational }}
+              OK</span>
+            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.vig.danger }} FS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Energy -->
+      <div routerLink="/energia"
+        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-yellow-500/50 transition-all cursor-pointer">
+        <div
+          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-yellow-500/10 blur-2xl group-hover:bg-yellow-500/20 transition-all">
+        </div>
+        <div class="relative z-10 flex flex-col h-full">
+          <div
+            class="p-3 rounded-xl bg-yellow-500/10 text-yellow-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-yellow-500/5">
+            <lucide-icon [name]="Zap" [size]="24"></lucide-icon>
+          </div>
+          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Energía</h3>
+          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.ener.total }} <span
+              class="text-sm font-medium text-slate-500">Infraestr.</span></p>
+          <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.ener.operational }}
+              OK</span>
+            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.ener.danger }} FS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grouped Detail Grid (Airports) -->
+    <div class="space-y-8 mt-12">
+      <div class="flex items-center justify-between mb-4 px-2">
+        <h2 class="text-xl font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
+          <div class="h-8 w-1.5 bg-blue-500 rounded-full glow-blue"></div>
+          Detalle por Emplazamiento
+        </h2>
+      </div>
+
+      <div *ngFor="let group of getGroupedEntries()" class="mb-12">
+        <div class="px-4 py-2 bg-slate-800/20 rounded-xl mb-6 border border-white/5 inline-block">
+          <span class="text-sm font-black text-blue-400 uppercase tracking-[0.3em]">{{ group[0] }}</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div *ngFor="let airport of group[1]" (click)="navigateToAirport(airport.name)"
+            class="group bg-slate-900/60 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-white/5 flex flex-col hover:border-blue-500/40 transition-all duration-300 cursor-pointer relative overflow-hidden">
+
+            <div class="flex items-start justify-between mb-6">
+              <div class="flex items-center gap-4">
+                <div
+                  class="p-3 bg-blue-500/10 text-blue-400 rounded-2xl group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500">
+                  <lucide-icon [name]="MapPin" [size]="24"></lucide-icon>
+                </div>
+                <div>
+                  <h4
+                    class="font-black text-xl text-white group-hover:text-blue-400 transition-colors uppercase tracking-tight">
+                    {{ airport.name }}</h4>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="w-2 h-2 rounded-full"
+                      [ngClass]="airport.availability >= 90 ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'"></span>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ airport.fir }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini stats breakdown -->
+            <div class="space-y-4">
+              <div class="flex justify-between items-end">
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Disponibilidad
+                  Operativa</span>
+                <span class="text-2xl font-black tracking-tighter"
+                  [ngClass]="airport.availability >= 90 ? 'text-emerald-400' : 'text-amber-400'">
+                  {{ airport.availability }}%
+                </span>
+              </div>
+              <div class="w-full bg-slate-950/50 rounded-full h-2 overflow-hidden border border-white/5">
+                <div class="h-full rounded-full transition-all duration-1000 ease-out"
+                  [ngClass]="airport.availability >= 90 ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-amber-500'"
+                  [style.width.%]="airport.availability"></div>
+              </div>
+
+              <div class="flex gap-2 pt-2">
+                <div class="flex-1 bg-slate-950/40 p-3 rounded-xl border border-white/5 flex flex-col items-center">
+                  <span class="text-lg font-black text-white">{{ airport.totalEquipments }}</span>
+                  <span class="text-[8px] font-black text-slate-600 uppercase">Equipos</span>
+                </div>
+                <div
+                  class="flex-1 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10 flex flex-col items-center">
+                  <span class="text-lg font-black text-emerald-400">{{ airport.operationalCount }}</span>
+                  <span class="text-[8px] font-black text-emerald-600/70 uppercase">Online</span>
+                </div>
+                <div class="flex-1 bg-red-500/5 p-3 rounded-xl border border-red-500/10 flex flex-col items-center">
+                  <span class="text-lg font-black text-red-400">{{ airport.errorCount }}</span>
+                  <span class="text-[8px] font-black text-red-600/70 uppercase">Falla</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Technicians overlay hint -->
+            <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <div *ngFor="let tech of airport.technicians.slice(0, 3)" [title]="tech"
+                  class="w-6 h-6 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-[8px] font-black text-blue-400 uppercase">
+                  {{ tech.substring(0, 2) }}
+                </div>
+                <div *ngIf="airport.technicians.length > 3"
+                  class="w-6 h-6 rounded-full bg-slate-700 border-2 border-slate-900 flex items-center justify-center text-[8px] font-black text-slate-300">
+                  +{{ airport.technicians.length - 3 }}
+                </div>
+                <div *ngIf="airport.technicians.length === 0" class="text-[10px] italic text-slate-600">Sin personal
+                  asignado</div>
+              </div>
+              <lucide-icon [name]="ChevronRight" [size]="16"
+                class="text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></lucide-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-slate-900/40 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/5 mt-12">
+      <div class="flex items-center justify-between mb-8">
+        <h3 class="text-xl font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
+          <div class="h-8 w-1.5 bg-blue-500 rounded-full glow-blue"></div>
+          Registros de Operación
+        </h3>
+        <button
+          class="text-xs font-black text-blue-400 uppercase tracking-widest hover:text-blue-300 transition-colors">Ver
+          todo el historial</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngFor="let notif of notifications"
+          class="flex gap-4 items-start p-5 rounded-2xl bg-slate-950/40 border border-white/5 hover:border-blue-500/30 transition-all group cursor-default">
+          <div
+            class="mt-1 w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 border border-white/5 group-hover:bg-blue-600/10 group-hover:text-blue-400 transition-all">
+            <lucide-icon
+              [name]="notif.type === 'SUCCESS' ? CheckCircle : (notif.type === 'ERROR' ? AlertTriangle : Info)"
+              [size]="24"
+              [class]="notif.type === 'SUCCESS' ? 'text-emerald-500' : (notif.type === 'ERROR' ? 'text-red-500' : 'text-blue-400')">
+            </lucide-icon>
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-1">
+              <span
+                class="text-[10px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded bg-white/5 text-slate-500">SISTEMA</span>
+              <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">{{ notif.createdAt |
+                date:'HH:mm' }} · {{ notif.createdAt | date:'MMM dd' }}</p>
+            </div>
+            <p class="text-slate-300 font-medium leading-relaxed group-hover:text-white transition-colors">{{
+              notif.message }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="notifications.length === 0" class="text-center py-20">
+        <lucide-icon [name]="History" [size]="48" class="text-slate-800 mx-auto mb-4"></lucide-icon>
+        <p class="text-slate-600 font-black uppercase tracking-widest font-mono">Sin actividad registrada en este ciclo
+        </p>
+      </div>
+    </div>
+  </ng-container>
+</div>

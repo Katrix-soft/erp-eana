@@ -1,0 +1,260 @@
+<div class="min-h-screen bg-[#0f172a] py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- background decorative elements -->
+    <div class="absolute top-0 left-0 w-full h-full noise-bg pointer-events-none"></div>
+    <div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
+
+    <div class="max-w-4xl mx-auto space-y-8 relative z-10">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            <p class="text-slate-400 animate-pulse font-medium">Cargando perfil...</p>
+        </div>
+
+        <!-- Profile Content -->
+        <div *ngIf="!loading && user" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+            <!-- Notifications Overlay -->
+            <div class="fixed top-24 right-4 z-50 flex flex-col gap-3 max-w-sm w-full">
+                <div *ngIf="successMessage"
+                    class="glass-panel border-green-500/20 text-green-400 px-5 py-4 rounded-2xl flex items-center gap-3 shadow-2xl animate-in slide-in-from-right-4">
+                    <div class="bg-green-500/20 p-2 rounded-lg">
+                        <lucide-icon [name]="Shield" [size]="20"></lucide-icon>
+                    </div>
+                    <span class="font-medium">{{ successMessage }}</span>
+                </div>
+
+                <div *ngIf="errorMessage"
+                    class="glass-panel border-red-500/20 text-red-400 px-5 py-4 rounded-2xl flex items-center gap-3 shadow-2xl animate-in slide-in-from-right-4">
+                    <div class="bg-red-500/20 p-2 rounded-lg">
+                        <lucide-icon [name]="X" [size]="20"></lucide-icon>
+                    </div>
+                    <span class="font-medium">{{ errorMessage }}</span>
+                </div>
+            </div>
+
+            <!-- Profile Header Section -->
+            <div class="glass-panel rounded-[2.5rem] overflow-hidden group shadow-2xl">
+                <!-- Cover Image Area -->
+                <div class="h-44 bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-800 relative">
+                    <div class="absolute inset-0 bg-black/10"></div>
+                    <div class="absolute inset-0 opacity-30 noise-bg"></div>
+                </div>
+
+                <div class="px-6 sm:px-10 pb-10">
+                    <div
+                        class="relative flex flex-col md:flex-row items-center md:items-end -mt-16 sm:-mt-20 mb-8 gap-6">
+                        <!-- Avatar with glow -->
+                        <div class="relative group/avatar">
+                            <div
+                                class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-[2rem] blur opacity-25 group-hover/avatar:opacity-40 transition duration-1000">
+                            </div>
+                            <div
+                                class="relative w-32 h-32 sm:w-40 sm:h-40 rounded-[1.8rem] bg-slate-900 p-2 shadow-2xl ring-4 ring-slate-950">
+                                <div
+                                    class="w-full h-full rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white scale-95 group-hover/avatar:scale-100 transition-transform duration-500">
+                                    <span class="text-5xl sm:text-6xl font-black tracking-tighter">
+                                        {{ user.personal?.nombre?.charAt(0) || user.email.charAt(0) }}{{
+                                        user.personal?.apellido?.charAt(0) || '' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Identity Info -->
+                        <div class="flex-1 text-center md:text-left space-y-1">
+                            <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                                {{ user.personal?.nombre }} {{ user.personal?.apellido }}
+                            </h1>
+                            <div class="flex flex-wrap justify-center md:justify-start items-center gap-3">
+                                <span
+                                    class="px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-bold tracking-wide uppercase">
+                                    {{ getRoleLabel(user.role) }}
+                                </span>
+                                <span *ngIf="user.personal?.aeropuerto"
+                                    class="flex items-center gap-1.5 text-slate-400 text-sm font-medium">
+                                    <lucide-icon [name]="MapPin" [size]="14"></lucide-icon>
+                                    {{ user.personal?.aeropuerto?.nombre }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Main Actions -->
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <button (click)="toggleEditProfile()"
+                                class="flex-1 md:flex-none btn-primary !bg-white/10 hover:!bg-white/20 !border-white/10 !text-white backdrop-blur-md">
+                                <lucide-icon [name]="editingProfile ? X : Edit" [size]="18"></lucide-icon>
+                                <span>{{ editingProfile ? 'Cerrar' : 'Editar' }}</span>
+                            </button>
+                            <button (click)="logout()" class="flex-1 md:flex-none btn-danger">
+                                <lucide-icon [name]="LogOut" [size]="18"></lucide-icon>
+                                <span>Salir</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="glass-card p-5 space-y-3 border-white/5">
+                            <div class="flex items-center gap-3 text-blue-400">
+                                <lucide-icon [name]="Mail" [size]="20"></lucide-icon>
+                                <span class="text-xs font-bold uppercase tracking-widest opacity-60">Email</span>
+                            </div>
+                            <p class="text-slate-200 font-medium truncate">{{ user.email }}</p>
+                        </div>
+
+                        <div class="glass-card p-5 space-y-3 border-white/5">
+                            <div class="flex items-center gap-3 text-indigo-400">
+                                <lucide-icon [name]="Shield" [size]="20"></lucide-icon>
+                                <span class="text-xs font-bold uppercase tracking-widest opacity-60">Permisos</span>
+                            </div>
+                            <p class="text-slate-200 font-medium truncate">{{ getRoleLabel(user.role) }}</p>
+                        </div>
+
+                        <div *ngIf="user.personal?.puesto"
+                            class="glass-card p-5 space-y-3 border-white/5 md:col-span-2 lg:col-span-1">
+                            <div class="flex items-center gap-3 text-emerald-400">
+                                <lucide-icon [name]="User" [size]="20"></lucide-icon>
+                                <span class="text-xs font-bold uppercase tracking-widest opacity-60">Posición</span>
+                            </div>
+                            <p class="text-slate-200 font-medium truncate">{{ user.personal?.puesto?.nombre }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                <!-- Edit Information -->
+                <div *ngIf="editingProfile"
+                    class="glass-panel p-8 rounded-[2rem] space-y-8 animate-in slide-in-from-left-4">
+                    <div class="space-y-2">
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                            <div class="p-2 bg-blue-500/20 rounded-xl text-blue-400">
+                                <lucide-icon [name]="Edit" [size]="22"></lucide-icon>
+                            </div>
+                            Datos de Usuario
+                        </h2>
+                        <p class="text-slate-400 text-sm">Actualiza tu información personal y de contacto.</p>
+                    </div>
+
+                    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div class="space-y-2">
+                                <label
+                                    class="text-sm font-bold text-slate-500 uppercase tracking-wider px-1">Nombre</label>
+                                <input type="text" formControlName="nombre" class="input-premium w-full"
+                                    placeholder="Ingresa tu nombre">
+                            </div>
+                            <div class="space-y-2">
+                                <label
+                                    class="text-sm font-bold text-slate-500 uppercase tracking-wider px-1">Apellido</label>
+                                <input type="text" formControlName="apellido" class="input-premium w-full"
+                                    placeholder="Ingresa tu apellido">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider px-1">Correo
+                                Electrónico</label>
+                            <input type="email" formControlName="email" class="input-premium w-full"
+                                placeholder="ejemplo@eana.com">
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" [disabled]="profileForm.invalid" class="btn-primary w-full group">
+                                <lucide-icon [name]="Save" [size]="20"
+                                    class="group-hover:scale-110 transition-transform"></lucide-icon>
+                                Confirmar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Security / Change Password -->
+                <div class="glass-panel p-8 rounded-[2rem] space-y-8">
+                    <div class="flex items-start justify-between">
+                        <div class="space-y-2">
+                            <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                                <div class="p-2 bg-purple-500/20 rounded-xl text-purple-400">
+                                    <lucide-icon [name]="Lock" [size]="22"></lucide-icon>
+                                </div>
+                                Seguridad
+                            </h2>
+                            <p class="text-slate-400 text-sm">Protege tu cuenta actualizando tu contraseña
+                                periódicamente.</p>
+                        </div>
+                        <button *ngIf="!changingPassword" (click)="toggleChangePassword()"
+                            class="text-blue-400 hover:text-blue-300 font-bold text-sm underline underline-offset-4 decoration-2">
+                            Modificar
+                        </button>
+                    </div>
+
+                    <div *ngIf="!changingPassword"
+                        class="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/5">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-slate-500">
+                            <lucide-icon [name]="Shield" [size]="24"></lucide-icon>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Estado de la cuenta</p>
+                            <p class="text-slate-500 text-sm font-medium">Contraseña segura y activa</p>
+                        </div>
+                    </div>
+
+                    <form *ngIf="changingPassword" [formGroup]="passwordForm" (ngSubmit)="changePassword()"
+                        class="space-y-5 animate-in slide-in-from-bottom-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider px-1">Contraseña
+                                Actual</label>
+                            <div class="relative">
+                                <input [type]="showCurrentPassword ? 'text' : 'password'"
+                                    formControlName="currentPassword" class="input-premium w-full pr-12">
+                                <button type="button" (click)="showCurrentPassword = !showCurrentPassword"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                                    <lucide-icon [name]="showCurrentPassword ? EyeOff : Eye" [size]="18"></lucide-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider px-1">Nueva
+                                Contraseña</label>
+                            <div class="relative">
+                                <input [type]="showNewPassword ? 'text' : 'password'" formControlName="newPassword"
+                                    class="input-premium w-full pr-12">
+                                <button type="button" (click)="showNewPassword = !showNewPassword"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                                    <lucide-icon [name]="showNewPassword ? EyeOff : Eye" [size]="18"></lucide-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider px-1">Repetir Nueva
+                                Contraseña</label>
+                            <div class="relative">
+                                <input [type]="showConfirmPassword ? 'text' : 'password'"
+                                    formControlName="confirmPassword" class="input-premium w-full pr-12">
+                                <button type="button" (click)="showConfirmPassword = !showConfirmPassword"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                                    <lucide-icon [name]="showConfirmPassword ? EyeOff : Eye" [size]="18"></lucide-icon>
+                                </button>
+                            </div>
+                            <p *ngIf="passwordForm.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched"
+                                class="text-red-400 text-xs font-bold mt-1 px-1">Las contraseñas no coinciden</p>
+                        </div>
+
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" [disabled]="passwordForm.invalid" class="btn-primary flex-1">
+                                Actualizar
+                            </button>
+                            <button type="button" (click)="toggleChangePassword()" class="btn-secondary">
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

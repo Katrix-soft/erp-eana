@@ -1,0 +1,378 @@
+<div *ngIf="user$ | async as user"
+    class="flex flex-col w-72 h-full bg-slate-900 text-slate-300 border-r border-slate-800 shadow-2xl z-50 overflow-hidden">
+    <div class="p-6 md:p-8 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-3">
+            <div>
+                <h1 class="text-xl font-black tracking-tight text-white leading-tight">CNS/EANA</h1>
+                <p class="text-[10px] text-blue-500 font-bold tracking-[0.2em] uppercase opacity-80">Gestión Integral
+                </p>
+            </div>
+        </div>
+        <button (click)="closeSidebar.emit()" class="lg:hidden text-slate-400 hover:text-white transition-colors">
+            <lucide-icon [name]="X" [size]="24"></lucide-icon>
+        </button>
+    </div>
+
+    <nav class="flex-1 px-4 space-y-2 overflow-y-auto min-h-0 custom-scrollbar pb-10">
+        <!-- Admin Menu -->
+        <ng-container *ngIf="isAdmin(user)">
+            <div class="mb-6">
+                <div class="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Administración
+                </div>
+
+                <!-- Estructura Group -->
+                <div class="space-y-1 mb-2">
+                    <div class="px-4 py-1 text-[10px] font-medium text-slate-600 uppercase tracking-wider">Estructura
+                    </div>
+                    <a routerLink="/admin/users"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Users" [size]="18"
+                            [class]="isPathActive('/admin/users') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Usuarios</span>
+                    </a>
+                    <a routerLink="/admin/firs"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Globe" [size]="18"
+                            [class]="isPathActive('/admin/firs') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>FIRs</span>
+                    </a>
+                    <a routerLink="/admin/aeropuertos"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="MapPin" [size]="18"
+                            [class]="isPathActive('/admin/aeropuertos') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Aeropuertos</span>
+                    </a>
+                    <a routerLink="/admin/personal"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Shield" [size]="18"
+                            [class]="isPathActive('/admin/personal') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Personal</span>
+                    </a>
+                    <a routerLink="/admin/puestos"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Briefcase" [size]="18"
+                            [class]="isPathActive('/admin/puestos') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Puestos</span>
+                    </a>
+                </div>
+
+                <!-- Equipamiento Group -->
+                <div class="space-y-1">
+                    <div class="px-4 py-1 text-[10px] font-medium text-slate-600 uppercase tracking-wider">Equipamiento
+                    </div>
+                    <a routerLink="/admin/comunicaciones"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Radio" [size]="18"
+                            [class]="isPathActive('/admin/comunicaciones') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Comunicaciones</span>
+                    </a>
+                    <a routerLink="/admin/navegacion"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Signal" [size]="18"
+                            [class]="isPathActive('/admin/navegacion') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Navegación</span>
+                    </a>
+                    <a routerLink="/admin/vigilancia"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Activity" [size]="18"
+                            [class]="isPathActive('/admin/vigilancia') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Vigilancia</span>
+                    </a>
+                    <a routerLink="/admin/energia"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Zap" [size]="18"
+                            [class]="isPathActive('/admin/energia') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Energía</span>
+                    </a>
+                    <a routerLink="/admin/vhf-importer"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="Upload" [size]="18"
+                            [class]="isPathActive('/admin/vhf-importer') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Importar VHF</span>
+                    </a>
+                    <a routerLink="/admin/audit"
+                        routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                        (click)="closeSidebar.emit()"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                        <lucide-icon [name]="History" [size]="18"
+                            [class]="isPathActive('/admin/audit') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span>Historial de Cambios</span>
+                    </a>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menu Principal</div>
+
+        <!-- Dashboard -->
+        <a routerLink="/dashboard"
+            routerLinkActive="bg-blue-600 text-white shadow-lg shadow-blue-600/20 translate-x-1 ring-1 ring-white/20"
+            [routerLinkActiveOptions]="{exact: true}" (click)="closeSidebar.emit()"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1">
+            <lucide-icon [name]="LayoutDashboard" [size]="20"
+                class="transition-colors group-hover:text-white fill-current"
+                [class.text-white]="isPathActive('/dashboard')"
+                [class.text-slate-500]="!isPathActive('/dashboard')"></lucide-icon>
+            <span class="font-medium">Dashboard</span>
+            <div *ngIf="isPathActive('/dashboard')"
+                class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-sm animate-pulse"></div>
+        </a>
+
+        <!-- Mantenimiento -->
+        <a routerLink="/mantenimiento"
+            routerLinkActive="bg-blue-600 text-white shadow-lg shadow-blue-600/20 translate-x-1 ring-1 ring-white/20"
+            (click)="closeSidebar.emit()"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1">
+            <lucide-icon [name]="Wrench" [size]="20" class="transition-colors group-hover:text-white"
+                [class.text-white]="isPathActive('/mantenimiento')"
+                [class.text-slate-500]="!isPathActive('/mantenimiento')"></lucide-icon>
+            <span class="font-medium">Mantenimiento</span>
+            <div *ngIf="isPathActive('/mantenimiento')"
+                class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-sm animate-pulse"></div>
+        </a>
+
+        <!-- Foro Técnico -->
+        <a routerLink="/foro"
+            routerLinkActive="bg-blue-600 text-white shadow-lg shadow-blue-600/20 translate-x-1 ring-1 ring-white/20"
+            (click)="closeSidebar.emit()"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1">
+            <lucide-icon [name]="MessageSquare" [size]="20" class="transition-colors group-hover:text-white"
+                [class.text-white]="isPathActive('/foro')"
+                [class.text-slate-500]="!isPathActive('/foro')"></lucide-icon>
+            <span class="font-medium">Foro Técnico</span>
+            <div *ngIf="isPathActive('/foro')"
+                class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-sm animate-pulse"></div>
+        </a>
+
+        <!-- Chat en Vivo -->
+        <a routerLink="/chat"
+            routerLinkActive="bg-blue-600 text-white shadow-lg shadow-blue-600/20 translate-x-1 ring-1 ring-white/20"
+            (click)="closeSidebar.emit()"
+            class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1">
+            <lucide-icon [name]="MessageCircle" [size]="20" class="transition-colors group-hover:text-white"
+                [class.text-white]="isPathActive('/chat')"
+                [class.text-slate-500]="!isPathActive('/chat')"></lucide-icon>
+            <span class="font-medium">Chat en Vivo</span>
+            <div *ngIf="isPathActive('/chat')"
+                class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-sm animate-pulse"></div>
+        </a>
+
+        <!-- Dynamic Sector Group - ADAPTED FOR TECHNICIANS -->
+        <div class="space-y-1">
+            <!-- For Technicians: Show only their sector IF they are FIR/Cabecera -->
+            <ng-container *ngIf="isTechnician(user) && isOneSectorOnly(user)">
+                <!-- Sector Header -->
+                <div class="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    {{ user.context.sector === 'CNSE' ? 'CNSE' : user.context.sector }}
+                </div>
+
+                <!-- CNSE Sector - VHF Equipment -->
+                <ng-container *ngIf="user.context.sector === 'CNSE'">
+                    <div class="space-y-1">
+                        <div class="px-4 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                            Comunicaciones
+                        </div>
+                        <a routerLink="/comunicaciones"
+                            routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                            (click)="closeSidebar.emit()"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                            <lucide-icon [name]="Radio" [size]="16"
+                                class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
+                            <span>Equipos VHF</span>
+                        </a>
+                    </div>
+                </ng-container>
+
+                <!-- Single Sector Access -->
+                <ng-container *ngIf="user.context.sector !== 'CNSE'">
+                    <div class="space-y-1">
+                        <ng-container [ngSwitch]="user.context.sector">
+                            <a *ngSwitchCase="'COMUNICACIONES'" routerLink="/comunicaciones"
+                                routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                (click)="closeSidebar.emit()"
+                                class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                <lucide-icon [name]="Radio" [size]="16"
+                                    class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
+                                <span>Equipos VHF</span>
+                            </a>
+                            <a *ngSwitchCase="'NAVEGACION'" routerLink="/navegacion"
+                                routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                (click)="closeSidebar.emit()"
+                                class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                <lucide-icon [name]="Signal" [size]="16"
+                                    class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
+                                <span>Equipos Radio</span>
+                            </a>
+                            <a *ngSwitchCase="'VIGILANCIA'" routerLink="/vigilancia"
+                                routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                (click)="closeSidebar.emit()"
+                                class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                <lucide-icon [name]="Radar" [size]="16"
+                                    class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
+                                <span>Radares y ADS-B</span>
+                            </a>
+                            <a *ngSwitchCase="'ENERGIA'" routerLink="/energia"
+                                routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                (click)="closeSidebar.emit()"
+                                class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                <lucide-icon [name]="Zap" [size]="16"
+                                    class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
+                                <span>Suministro Eléctrico</span>
+                            </a>
+                            <!-- Add other cases like ENERGIA as needed but keeping it simple for now -->
+                            <a *ngSwitchDefault routerLink="/comunicaciones"
+                                routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                (click)="closeSidebar.emit()"
+                                class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                <lucide-icon [name]="Server" [size]="16"
+                                    class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
+                                <span>Equipos Radio</span>
+                            </a>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </ng-container>
+
+            <!-- For Admin/Coordinators OR Technicians in small airports: Show all sectors with collapsible menu -->
+            <ng-container *ngIf="!isTechnician(user) || !isOneSectorOnly(user)">
+                <button (click)="toggleComms()"
+                    [class]="isCommsActive() ? 'text-white bg-slate-800/50 border border-slate-700/50' : 'text-slate-400 hover:bg-white/5 hover:text-white'"
+                    class="w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group">
+                    <div class="flex items-center gap-3">
+                        <lucide-icon [name]="MessageSquare" [size]="20"
+                            [class]="isCommsActive() ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                            class="transition-colors"></lucide-icon>
+                        <span class="font-medium capitalize">
+                            {{ getSectionTitle(user) === 'CNSE' ? 'CNSE' : getSectionTitle(user).toLowerCase() }}
+                        </span>
+                    </div>
+                    <lucide-icon [name]="commsOpen ? ChevronDown : ChevronRight" [size]="16"></lucide-icon>
+                </button>
+
+                <div *ngIf="commsOpen" class="pl-4 space-y-5 mt-2 animate-in slide-in-from-top-2 duration-300">
+                    <!-- Comunicaciones  -->
+                    <div class="space-y-1">
+                        <div
+                            class="px-4 py-1 text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] border-l border-slate-800">
+                            Comunicaciones
+                        </div>
+                        <a [routerLink]="['/comunicaciones']"
+                            routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                            (click)="closeSidebar.emit()"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                            <lucide-icon [name]="Radio" [size]="16"
+                                [class]="isPathActive('/comunicaciones') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                class="transition-colors"></lucide-icon>
+                            <span>Equipos VHF</span>
+                        </a>
+                    </div>
+
+                    <!-- NAVEGACIÓN -->
+                    <div class="space-y-1">
+                        <div
+                            class="px-4 py-1 text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] border-l border-slate-800">
+                            Navegación
+                        </div>
+                        <a routerLink="/navegacion"
+                            routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                            (click)="closeSidebar.emit()"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                            <lucide-icon [name]="Signal" [size]="16"
+                                [class]="isPathActive('/navegacion') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                class="transition-colors"></lucide-icon>
+                            <span>Radioayudas</span>
+                        </a>
+                    </div>
+
+                    <!-- Vigilancia -->
+                    <div class="space-y-1">
+                        <div
+                            class="px-4 py-1 text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] border-l border-slate-800">
+                            Vigilancia
+                        </div>
+                        <a routerLink="/vigilancia"
+                            routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                            (click)="closeSidebar.emit()"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                            <lucide-icon [name]="Activity" [size]="16"
+                                [class]="isPathActive('/vigilancia') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                class="transition-colors"></lucide-icon>
+                            <span>Radar / ADS-B</span>
+                        </a>
+                    </div>
+
+                    <!-- Energia  -->
+                    <div class="space-y-1">
+                        <div
+                            class="px-4 py-1 text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] border-l border-slate-800">
+                            Energía
+                        </div>
+                        <a routerLink="/energia"
+                            routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                            (click)="closeSidebar.emit()"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                            <lucide-icon [name]="Zap" [size]="16"
+                                [class]="isPathActive('/energia') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                class="transition-colors"></lucide-icon>
+                            <span>Suministro Eléctrico</span>
+                        </a>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </nav>
+
+    <div class="p-4 pb-6 border-t border-slate-800 bg-slate-900 shrink-0">
+        <a routerLink="/profile" (click)="closeSidebar.emit()"
+            class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-900 transition-colors group border border-transparent hover:border-slate-800 cursor-pointer">
+            <div
+                class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 font-bold text-sm shrink-0 group-hover:scale-105 transition-transform ring-2 ring-blue-500/20 group-hover:ring-blue-500/40">
+                {{ user.context?.nombre ? (user.context.nombre.charAt(0) +
+                user.context.apellido.charAt(0)).toUpperCase() : 'US' }}
+            </div>
+            <div class="flex flex-col overflow-hidden">
+                <span class="text-blue-400 font-bold text-sm truncate group-hover:text-blue-300 transition-colors">Mi
+                    Perfil</span>
+                <span class="text-slate-500 text-xs truncate group-hover:text-slate-400 transition-colors">
+                    {{ user.context?.nombre ? (user.context.nombre + ' ' + user.context.apellido) : user.email }}
+                </span>
+            </div>
+            <div class="ml-auto">
+                <lucide-icon [name]="LogOut" [size]="16"
+                    class="text-slate-600 hover:text-red-400 cursor-pointer transition-colors"
+                    (click)="logout(); $event.stopPropagation()"></lucide-icon>
+            </div>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,85 @@
+<div class="space-y-6" [formGroup]="form">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+
+        <ng-container *ngFor="let item of checklistItems">
+
+            <!-- Toggle Type (Al Aire) -->
+            <div *ngIf="item.type === 'toggle'" class="flex flex-col gap-2">
+                <label class="text-sm text-slate-400 font-medium">{{ item.label }}</label>
+                <div class="flex items-center gap-4">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" [formControlName]="item.name" class="sr-only peer">
+                        <div
+                            class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                        </div>
+                    </label>
+                    <span class="text-sm font-medium text-slate-300">{{ item.rightLabel }}</span>
+                </div>
+            </div>
+
+            <!-- Search Type (Estado Operativo placeholder) -->
+            <div *ngIf="item.type === 'search'" class="flex flex-col gap-2">
+                <label class="text-xs text-blue-500 font-medium">{{ item.label }}</label>
+                <div class="relative">
+                    <input type="text" [placeholder]="item.placeholder" disabled
+                        class="w-full bg-white border border-blue-800 text-slate-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-slate-900 dark:border-blue-900 dark:placeholder-slate-400 dark:text-white" />
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <lucide-icon [name]="ChevronDown" [size]="16" class="text-blue-500"></lucide-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standard Radio (Cumple / No cumple) -->
+            <div *ngIf="!item.type" class="flex flex-row justify-between items-start group">
+                <div class="flex flex-col gap-3 w-full">
+                    <label class="text-sm text-blue-900 dark:text-blue-200 font-medium">{{ item.label }}</label>
+
+                    <div class="space-y-2">
+                        <!-- Option: Cumple (SI) -->
+                        <label class="flex items-center gap-3 cursor-pointer group/opt">
+                            <div
+                                class="relative flex items-center justify-center w-6 h-6 rounded-full border-2 border-blue-900 dark:border-blue-400 transition-all group-hover/opt:border-blue-600">
+                                <input type="radio" [formControlName]="item.name" value="SI" class="peer sr-only">
+                                <div
+                                    class="w-3 h-3 rounded-full bg-blue-900 dark:bg-blue-400 opacity-0 peer-checked:opacity-100 transition-opacity">
+                                </div>
+                            </div>
+                            <span
+                                class="text-lg text-slate-900 dark:text-white font-normal group-hover/opt:text-blue-600 dark:group-hover/opt:text-blue-300 transition-colors">Cumple</span>
+                        </label>
+
+                        <!-- Option: No Cumple (NO) -->
+                        <label class="flex items-center gap-3 cursor-pointer group/opt">
+                            <div
+                                class="relative flex items-center justify-center w-6 h-6 rounded-full border-2 border-blue-900 dark:border-blue-400 transition-all group-hover/opt:border-blue-600">
+                                <input type="radio" [formControlName]="item.name" value="NO" class="peer sr-only">
+                                <div
+                                    class="w-3 h-3 rounded-full bg-blue-900 dark:bg-blue-400 opacity-0 peer-checked:opacity-100 transition-opacity">
+                                </div>
+                                <!-- Inner dot for NO usually same color or maybe red? User image shows filled circle. -->
+                                <div
+                                    class="absolute inset-0 rounded-full ring-2 ring-transparent peer-checked:ring-slate-900/10">
+                                </div>
+                            </div>
+                            <span
+                                class="text-lg text-slate-900 dark:text-white font-normal group-hover/opt:text-blue-600 dark:group-hover/opt:text-blue-300 transition-colors">No
+                                cumple</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Expand Arrow (Dummy for visual match) -->
+                <div class="pt-8 text-slate-400">
+                    <lucide-icon class="w-1 h-8 opacity-20" [name]="ChevronsUpDown"></lucide-icon>
+                    <!-- Using icon or div to simulate the slider bar -->
+                    <div class="w-1 h-8 bg-slate-300 rounded-full mx-auto relative top-1">
+                        <div class="w-2 h-2 bg-slate-400 rounded-full absolute -top-1 -left-0.5"></div>
+                        <div class="w-2 h-2 bg-slate-400 rounded-full absolute -bottom-1 -left-0.5"></div>
+                    </div>
+                </div>
+            </div>
+
+        </ng-container>
+
+    </div>
+</div>

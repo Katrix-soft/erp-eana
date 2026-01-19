@@ -1,0 +1,166 @@
+<div class="p-4 md:p-6 lg:p-8 bg-slate-950 min-h-screen text-slate-100">
+    <!-- Modern Header -->
+    <div
+        class="glass-card rounded-[2.5rem] p-8 mb-10 border border-white/5 shadow-2xl animate-slide-up relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-amber-600/10 rounded-full blur-[80px]"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px]"></div>
+
+        <div class="relative z-10 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8">
+            <div class="space-y-2">
+                <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight flex items-center gap-4">
+                    <div
+                        class="w-2 h-12 bg-gradient-to-b from-amber-500 to-amber-700 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.5)]">
+                    </div>
+                    Auditoría de Sistema
+                </h1>
+                <p class="text-slate-400 text-sm md:text-base font-medium pl-6 border-l border-slate-800/50">
+                    Trazabilidad total de operaciones y seguridad institucional.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
+                <div class="relative w-full sm:w-96 group">
+                    <div
+                        class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-amber-400 transition-colors">
+                        <lucide-icon [name]="Search" [size]="20"></lucide-icon>
+                    </div>
+                    <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()"
+                        placeholder="Filtrar por usuario, acción o ID..."
+                        class="w-full bg-slate-950/80 border border-slate-800/50 rounded-[1.5rem] py-4 pl-14 pr-6 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-500/50 transition-all shadow-inner">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Container -->
+    <div class="animate-slide-up" style="animation-delay: 0.1s">
+
+        <!-- DESKTOP TABLE VIEW -->
+        <div class="hidden xl:block glass-card rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-slate-950/60 backdrop-blur-md">
+                            <th
+                                class="px-10 py-7 text-left text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] border-b border-white/[0.03]">
+                                Fecha y Hora</th>
+                            <th
+                                class="px-10 py-7 text-left text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] border-b border-white/[0.03]">
+                                Usuario</th>
+                            <th
+                                class="px-10 py-7 text-left text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] border-b border-white/[0.03]">
+                                Acción</th>
+                            <th
+                                class="px-10 py-7 text-left text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] border-b border-white/[0.03]">
+                                Entidad</th>
+                            <th
+                                class="px-10 py-7 text-left text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] border-b border-white/[0.03]">
+                                ID</th>
+                            <th
+                                class="px-10 py-7 text-right text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] border-b border-white/[0.03]">
+                                IP / Origen</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/[0.02]">
+                        <tr *ngFor="let log of filteredLogs" class="hover:bg-amber-500/[0.04] transition-all group">
+                            <td class="px-10 py-6 text-sm">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-slate-200">{{ log.createdAt | date:'dd MMM, yyyy'
+                                        }}</span>
+                                    <span class="text-[10px] uppercase font-black text-slate-500 tracking-widest">{{
+                                        log.createdAt | date:'HH:mm:ss' }}</span>
+                                </div>
+                            </td>
+                            <td class="px-10 py-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-white/5">
+                                        <span class="text-[10px] font-black text-slate-400">{{ (log.user?.email ||
+                                            'S')[0].toUpperCase() }}</span>
+                                    </div>
+                                    <span class="text-sm font-semibold text-slate-300">{{ log.user?.email || 'Sistema'
+                                        }}</span>
+                                </div>
+                            </td>
+                            <td class="px-10 py-6">
+                                <span [ngClass]="getActionClass(log.action)"
+                                    class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border">
+                                    {{ log.action }}
+                                </span>
+                            </td>
+                            <td class="px-10 py-6">
+                                <span class="text-sm font-bold text-slate-300 uppercase tracking-tighter">{{ log.entity
+                                    }}</span>
+                            </td>
+                            <td class="px-10 py-6">
+                                <span
+                                    class="text-[11px] font-mono text-slate-500 bg-slate-900/50 px-2 py-0.5 rounded border border-white/5">#{{
+                                    log.entityId }}</span>
+                            </td>
+                            <td class="px-10 py-6 text-right">
+                                <span class="text-[10px] font-black text-slate-600 font-mono"
+                                    [title]="log.userAgent || ''">{{ log.ipAddress || 'Interno' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MOBILE CARD VIEW -->
+        <div class="xl:hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div *ngFor="let log of filteredLogs"
+                class="glass-card rounded-[2.5rem] p-8 shadow-2xl hover:border-amber-500/40 transition-all group">
+
+                <div class="flex justify-between items-start mb-6 border-b border-white/[0.03] pb-4">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-black text-amber-500 uppercase tracking-[0.2em] mb-1">Evento de
+                            Seguridad</span>
+                        <span class="text-xs font-black text-slate-500">{{ log.createdAt | date:'dd/MM/yyyy HH:mm:ss'
+                            }}</span>
+                    </div>
+                    <span [ngClass]="getActionClass(log.action)"
+                        class="px-3 py-1 rounded-lg text-[9px] font-bold uppercase border">
+                        {{ log.action }}
+                    </span>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex flex-col gap-1">
+                        <label
+                            class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Responsable</label>
+                        <span class="text-sm font-bold text-slate-200">{{ log.user?.email || 'Sistema' }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div class="flex flex-col gap-1">
+                            <label
+                                class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Entidad</label>
+                            <span class="text-xs font-black text-white uppercase">{{ log.entity }}</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label
+                                class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Referencia</label>
+                            <span class="text-xs font-mono text-slate-400">#{{ log.entityId }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-white/[0.03] flex justify-between items-center text-[9px]">
+                    <span class="text-slate-600 font-mono">IP: {{ log.ipAddress || 'INTERNO' }}</span>
+                    <span class="text-slate-600 uppercase font-black tracking-tighter">Verified Logic</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredLogs.length === 0"
+            class="py-40 glass-card rounded-[2.5rem] text-center border border-white/5">
+            <div class="flex flex-col items-center gap-4">
+                <lucide-icon [name]="Search" [size]="48" class="text-slate-800"></lucide-icon>
+                <p class="text-slate-600 font-black uppercase tracking-[0.2em] text-xs">Sin registros de auditoría para
+                    la consulta</p>
+            </div>
+        </div>
+    </div>
+</div>
