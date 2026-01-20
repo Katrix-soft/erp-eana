@@ -1,8 +1,5 @@
 FROM node:20-alpine AS build
 
-# instalar wget
-RUN apk add --no-cache wget
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -20,6 +17,8 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=build /app/dist ./dist
+COPY scripts ./scripts
+COPY *.csv ./
 RUN mkdir -p uploads
 
 CMD ["node", "dist/main.js"]
