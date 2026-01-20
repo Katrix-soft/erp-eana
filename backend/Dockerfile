@@ -1,5 +1,8 @@
 FROM node:20-alpine AS build
 
+# instalar wget
+RUN apk add --no-cache wget
+
 WORKDIR /app
 
 COPY package*.json ./
