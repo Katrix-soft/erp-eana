@@ -1,0 +1,29 @@
+t=2025-12-18T14:48:58-0300 lvl=info msg="no configuration paths supplied"
+t=2025-12-18T14:48:58-0300 lvl=info msg="using configuration at default config path" path=C:\\Users\\exe20\\AppData\\Local/ngrok/ngrok.yml
+t=2025-12-18T14:48:58-0300 lvl=info msg="open config file" path=C:\\Users\\exe20\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+t=2025-12-18T14:48:58-0300 lvl=info msg="FIPS 140 mode" enabled=false
+t=2025-12-18T14:48:59-0300 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+t=2025-12-18T14:49:01-0300 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-18T14:49:01-0300 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-18T14:49:01-0300 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://localhost:4200 url=https://11efc49f994e.ngrok-free.app
+t=2025-12-18T14:49:02-0300 lvl=info msg="update available" obj=updater
+t=2025-12-18T14:51:31-0300 lvl=info msg=start pg=/api/tunnels/command_line id=f19675676a998199
+t=2025-12-18T14:51:31-0300 lvl=info msg=end pg=/api/tunnels/command_line id=f19675676a998199 status=204 dur=143.556ms
+t=2025-12-18T14:51:31-0300 lvl=info msg="failed to accept connection: Listener closed" obj=tunnels.session clientid=e2b2dcc1ac8a69480fe2454462c5bb92
+t=2025-12-18T14:51:31-0300 lvl=warn msg="Stopping forwarder" name=command_line acceptErr="failed to accept connection: Listener closed"
+t=2025-12-18T14:51:31-0300 lvl=info msg="Error handling the forwarder accept error" error="no tunnel found with requested name"
+t=2025-12-18T17:56:18-0300 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=f19dcf2f1318 clientid=77656b0e7acf603bd16bd026375d39df
+t=2025-12-18T17:56:34-0300 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=f3928d56a1c9 err="write tcp 192.168.1.39:49680->54.207.159.193:443: wsasend: An established connection was aborted by the software in your host machine."
+t=2025-12-18T17:56:41-0300 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-18T17:56:41-0300 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-18T19:19:52-0300 lvl=info msg=start pg=/api/tunnels id=ea1a3d5aefbe5085
+t=2025-12-18T19:19:52-0300 lvl=info msg=end pg=/api/tunnels id=ea1a3d5aefbe5085 status=200 dur=50.9514ms
+t=2025-12-18T19:34:46-0300 lvl=info msg=start pg=/api/tunnels id=27e5c7cf489201e7
+t=2025-12-18T19:34:46-0300 lvl=info msg=end pg=/api/tunnels id=27e5c7cf489201e7 status=200 dur=37.5031ms
+t=2025-12-18T20:47:33-0300 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=333f7b74f792 clientid=77656b0e7acf603bd16bd026375d39df
+t=2025-12-18T20:47:36-0300 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=f3928d56a1c9 err="read tcp 192.168.1.39:55361->15.229.104.219:443: wsarecv: An established connection was aborted by the software in your host machine."
+t=2025-12-18T20:47:39-0300 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2025-12-18T20:55:33-0300 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2025-12-18T20:55:45-0300 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-18T20:55:45-0300 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-18T20:55:55-0300 lvl=warn msg="failed to check for update" obj=updater err="Post \"https://update.equinox.io/check\": context deadline exceeded"

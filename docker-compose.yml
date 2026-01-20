@@ -24,7 +24,7 @@ services:
 
   backend:
     build:
-      context: ./backend-nest
+      context: ./backend
       dockerfile: Dockerfile
     container_name: cns_backend
     restart: always
@@ -39,7 +39,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-supersecretkey_change_in_production}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     env_file:
-      - ./backend-nest/.env
+      - ./backend/.env
     depends_on:
       - postgres
     ports:
@@ -65,7 +65,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend-angular
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: cns_frontend
     restart: always

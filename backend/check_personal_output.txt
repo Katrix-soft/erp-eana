@@ -1,0 +1,26 @@
+prisma:warn In production, we recommend using `prisma generate --no-engine` (See: `prisma generate --help`)
+Personal info:
+{
+  id: 92,
+  nombre: 'Gerardo Elbert',
+  apellido: 'Sanchez Ramirez',
+  dni: '30377525',
+  puestoId: 1,
+  aeropuertoId: null,
+  createdAt: 2026-01-08T15:23:07.180Z,
+  userId: 93,
+  sector: 'COMUNICACIONES',
+  firId: 1,
+  user: {
+    id: 93,
+    email: 'gsanchezramirez@eana.com.ar',
+    password: '$2b$10$C.Pmsl3hFy6AasoORxtrUeLw.TIwPTmcsNcYHtoXwFRb/gSK1AoWW',
+    role: 'TECNICO',
+    createdAt: 2026-01-08T15:23:06.742Z,
+    resetToken: null,
+    resetTokenExpiry: null,
+    passwordChanged: false
+  },
+  aeropuerto: null,
+  fir: { id: 1, nombre: 'CBA', createdAt: 2026-01-08T14:55:24.532Z }
+}

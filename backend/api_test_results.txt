@@ -1,0 +1,15 @@
+Logging in...
+Login successful. Token acquired.
+User Context: {
+  "nombre": "Alfredo German",
+  "apellido": "Sanchez",
+  "sector": "CNSE",
+  "aeropuerto": "Malargue",
+  "aeropuertoCodigo": "MLG",
+  "fir": "DOZ",
+  "puesto": "Coordinador"
+}
+
+Fetching Vigilancia...
+Vigilancia Results count: 1
+- ID: 338, Ubicacion: RADAR / Malarg├╝e / ID-118, AeroId: 34

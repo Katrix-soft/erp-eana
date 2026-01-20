@@ -1,0 +1,130 @@
+═══════════════════════════════════════════════════════════════
+           CREDENCIALES FINALES - SISTEMA CNS/EANA
+═══════════════════════════════════════════════════════════════
+
+📊 RESUMEN DE LA MIGRACIÓN:
+   ✅ 311 usuarios migrados desde CSV
+   ✅ 23 puestos únicos (cargos)
+   ✅ Contraseña genérica para todos: Eana2025
+   ✅ Usuario admin preservado
+
+───────────────────────────────────────────────────────────────
+
+🔐 FORMATO DE LOGIN:
+
+   Campo Usuario: [username]
+   Campo Contraseña: Eana2025
+
+   IMPORTANTE: 
+   - NO incluir @eana.com.ar en el campo usuario
+   - El backend lo agrega automáticamente
+
+───────────────────────────────────────────────────────────────
+
+📝 EJEMPLOS DE CREDENCIALES VÁLIDAS:
+
+1. ADMINISTRADOR
+   Usuario: admin
+   Contraseña: admin1234
+   Rol: ADMIN
+   ✅ Ve TODO + Backoffice
+
+2. JEFE REGIONAL CNS
+   Usuario: ppayero
+   Contraseña: Eana2025
+   Nombre: Pablo Payero
+   Cargo: Jefe Regional CNSE
+   Rol: CNS_NACIONAL
+   ✅ Ve TODO + Backoffice
+
+3. COORDINADOR
+   Usuario: mquatrano
+   Contraseña: Eana2025
+   Nombre: Marco Antonio Quatrano
+   Cargo: Coordinador CNSE - Comunicaciones
+   Rol: JEFE_COORDINADOR
+   ✅ Ve Backoffice + Su FIR/Aeropuerto
+
+4. COORDINADOR ADJUNTO
+   Usuario: abellandi
+   Contraseña: Eana2025
+   Nombre: Alejandro Adrian Bellandi
+   Cargo: Coordinador Adjunto CNSE - Comunicaciones
+   Rol: JEFE_COORDINADOR
+   ✅ Ve Backoffice + Su FIR/Aeropuerto
+
+5. TÉCNICO
+   Usuario: mcarrasco
+   Contraseña: Eana2025
+   Nombre: Manuel Delfin Carrasco
+   Cargo: Técnico CNSE - Comunicaciones
+   Rol: TECNICO
+   ❌ NO ve Backoffice, solo su FIR/Aeropuerto
+
+───────────────────────────────────────────────────────────────
+
+🎯 INSTRUCCIONES DE USO:
+
+1. Ir a: http://localhost:3001/login
+
+2. En el campo "Usuario" ingresar SOLO el username:
+   ✅ CORRECTO: ppayero
+   ❌ INCORRECTO: ppayero@eana.com.ar
+
+3. En el campo "Contraseña" ingresar:
+   Eana2025
+
+4. Click en "Ingresar"
+
+───────────────────────────────────────────────────────────────
+
+📋 PERMISOS POR ROL:
+
+┌─────────────────────┬──────────────┬─────────────────────┐
+│ ROL                 │ VE BACKOFFICE│ VE EQUIPOS          │
+├─────────────────────┼──────────────┼─────────────────────┤
+│ ADMIN               │ ✅ SÍ        │ ✅ TODOS            │
+│ CNS_NACIONAL        │ ✅ SÍ        │ ✅ TODOS            │
+│ JEFE_COORDINADOR    │ ✅ SÍ        │ 🔒 Su FIR/Aerop.    │
+│ TECNICO             │ ❌ NO        │ 🔒 Su FIR/Aerop.    │
+└─────────────────────┴──────────────┴─────────────────────┘
+
+───────────────────────────────────────────────────────────────
+
+📁 ARCHIVOS GENERADOS:
+
+1. CREDENCIALES_VALIDAS.txt (este archivo)
+   - Todas las credenciales organizadas por rol
+   - Incluye nombre, cargo, sector, aeropuerto
+
+2. CREDENCIALES_VALIDAS.csv
+   - Para abrir en Excel
+   - Permite buscar y filtrar usuarios
+
+Ubicación: backend-nest/
+
+───────────────────────────────────────────────────────────────
+
+✅ DATOS MIGRADOS CORRECTAMENTE:
+
+✓ Nombre y Apellido
+✓ Cargo → Puesto Personal
+✓ Departamento → Sector
+✓ Código OACI → Aeropuerto
+✓ FIR → Región
+✓ Email → Usuario@eana.com.ar
+✓ Rol según cargo
+
+───────────────────────────────────────────────────────────────
+
+🔄 PRÓXIMOS PASOS:
+
+1. Probar login con diferentes usuarios
+2. Verificar que técnicos NO vean backoffice
+3. Verificar que cada usuario vea solo sus equipos
+4. Confirmar que admin ve TODO
+
+═══════════════════════════════════════════════════════════════
+Última actualización: 2025-12-09 18:31
+Estado: ✅ MIGRACIÓN COMPLETADA
+═══════════════════════════════════════════════════════════════
