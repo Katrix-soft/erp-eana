@@ -32,8 +32,8 @@ services:
 
       JWT_SECRET: ${JWT_SECRET}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-    env_file:
-      - ./backend/.env
+    # env_file:
+    #   - ./backend/.env
     depends_on:
       - postgres
     ports:
