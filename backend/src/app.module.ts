@@ -62,7 +62,7 @@ import { AppService } from './app.service';
                 password: config.get<string>('POSTGRES_PASSWORD', 'postgrespassword'),
                 database: config.get<string>('POSTGRES_DB', 'cns_db'),
                 entities: [__dirname + '/**/*.entity{.ts,.js}'],
-                synchronize: false,
+                synchronize: true,
                 logging: config.get<string>('NODE_ENV') !== 'production',
                 poolSize: 10,
             }),
