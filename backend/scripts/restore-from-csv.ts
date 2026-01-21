@@ -6,7 +6,7 @@ import { parse } from 'csv-parse/sync';
 
 require('dotenv').config();
 
-const DATA_DIR = path.join(__dirname, '..', '..'); // Root where files are
+const DATA_DIR = path.join(__dirname, '..'); // The CSVs are in the backend/ root in the container
 
 // Map filename to table name
 const FILES_TO_TABLES = [
@@ -18,13 +18,14 @@ const FILES_TO_TABLES = [
     { file: 'vhf_202601161523.csv', table: 'vhf' },
     { file: 'equipos_202601161523.csv', table: 'equipos' },
     { file: 'canales_202601161523.csv', table: 'canales' },
-    // { file: 'frecuencias_202601161523.csv', table: 'frecuencias' }, // Assuming user forgot this or it's embedded? User list didn't include it explicitely but mention "frecuencias" in context of previous logic. Let's skip if not present.
+    { file: 'frecuencias_202601161523.csv', table: 'frecuencias' },
     { file: 'comunicaciones_202601161523.csv', table: 'comunicaciones' },
     { file: 'activos_comunicaciones_202601161523.csv', table: 'activos_comunicaciones' },
     { file: 'navegacion_202601161523.csv', table: 'navegacion' },
     { file: 'equipos_navegacion_202601161523.csv', table: 'equipos_navegacion' },
     { file: 'vigilancia_202601161523.csv', table: 'vigilancia' },
     { file: 'energia_202601161523.csv', table: 'energia' },
+    { file: 'turnos_202601161523.csv', table: 'turnos' },
     { file: 'chat_rooms_202601161523.csv', table: 'chat_rooms' },
     { file: 'chat_participants_202601161523.csv', table: 'chat_participants' },
     { file: 'chat_messages_202601161523.csv', table: 'chat_messages' },
@@ -35,8 +36,7 @@ const FILES_TO_TABLES = [
     { file: 'notifications_202601161523.csv', table: 'notifications' },
     { file: 'audit_logs_202601161523.csv', table: 'audit_logs' },
     { file: 'system_settings_202601161523.csv', table: 'system_settings' },
-    // { file: 'authenticators_202601161523.csv', table: 'authenticators' }, // Usually not needed if users have passwords
-    // { file: 'vor_measurements_202601161523.csv', table: 'vor_measurements' }, 
+    { file: 'vor_measurements_202601161523.csv', table: 'vor_measurements' },
 ];
 
 async function main() {
