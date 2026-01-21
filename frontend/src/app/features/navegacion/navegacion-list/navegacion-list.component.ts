@@ -25,7 +25,7 @@ type NavView = 'MENU' | 'CHECKLIST' | 'VOR' | 'DOCS' | 'HISTORY';
         HistoryTableComponent
     ],
     template: `
-    <div class="h-screen overflow-hidden bg-slate-950 p-6 space-y-6 transition-colors duration-500">
+    <div class="min-h-screen bg-slate-950 p-4 md:p-6 space-y-6 transition-colors duration-500 overflow-x-hidden">
         
         <!-- Header -->
         <div class="flex items-center justify-between animate-in slide-in-from-top duration-500">
@@ -35,62 +35,62 @@ type NavView = 'MENU' | 'CHECKLIST' | 'VOR' | 'DOCS' | 'HISTORY';
                     <lucide-icon [name]="ArrowLeft" [size]="24"></lucide-icon>
                 </button>
                 
-                <div>
-                   <h1 class="text-3xl font-bold text-white tracking-tight drop-shadow-md">
+                <div class="max-w-[calc(100vw-80px)]">
+                   <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md truncate">
                        {{ getTitle() }}
                    </h1>
-                   <p *ngIf="currentView === 'MENU'" class="text-sky-50 text-base font-medium drop-shadow-sm">Seleccione una tarea para comenzar</p>
+                   <p *ngIf="currentView === 'MENU'" class="text-sky-50/70 text-sm md:text-base font-medium drop-shadow-sm">Seleccione una tarea para comenzar</p>
                 </div>
             </div>
         </div>
 
         <!-- MAIN MENU VIEW -->
-        <div *ngIf="currentView === 'MENU'" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 animate-in fade-in zoom-in duration-500">
+        <div *ngIf="currentView === 'MENU'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 pt-4 md:pt-8 animate-in fade-in zoom-in duration-500 pb-10">
              
              <!-- Checklist Card -->
              <button (click)="setView('CHECKLIST')" 
-                class="group relative h-40 bg-gradient-to-r from-[#594bf3] to-[#7f71fc] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
-                 <div class="absolute right-0 top-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
-                     <lucide-icon [name]="CheckSquare" [size]="100"></lucide-icon>
+                class="group relative h-32 md:h-40 bg-gradient-to-r from-[#594bf3] to-[#7f71fc] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
+                 <div class="absolute right-0 top-0 p-4 md:p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
+                     <lucide-icon [name]="CheckSquare" [size]="80"></lucide-icon>
                  </div>
                  <div class="relative z-10 h-full flex flex-col justify-between">
-                     <h2 class="text-2xl font-bold text-white leading-tight">Checklist semanal<br>Radioayudas</h2>
-                     <p class="text-indigo-200 font-medium">(ILS / VOR / DME / NDB)</p>
+                     <h2 class="text-xl md:text-2xl font-bold text-white leading-tight">Checklist<br class="hidden md:block"> Radioayudas</h2>
+                     <p class="text-indigo-200 text-xs md:text-sm font-medium">(ILS / VOR / DME / NDB)</p>
                  </div>
              </button>
 
              <!-- Docs Card -->
              <button (click)="setView('DOCS')" 
-                class="group relative h-40 bg-gradient-to-r from-[#0d6efd] to-[#0a58ca] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
-                 <div class="absolute right-0 top-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
-                     <lucide-icon [name]="FileText" [size]="100"></lucide-icon>
+                class="group relative h-32 md:h-40 bg-gradient-to-r from-[#0d6efd] to-[#0a58ca] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
+                 <div class="absolute right-0 top-0 p-4 md:p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
+                     <lucide-icon [name]="FileText" [size]="80"></lucide-icon>
                  </div>
                  <div class="relative z-10 h-full flex flex-col justify-center">
-                     <h2 class="text-2xl font-bold text-white">Gestión Documental</h2>
+                     <h2 class="text-xl md:text-2xl font-bold text-white leading-tight">Gestión<br class="hidden md:block"> Documental</h2>
                  </div>
              </button>
 
              <!-- History Card -->
              <button (click)="setView('HISTORY')" 
-                class="group relative h-40 bg-[#191c24] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
-                 <div class="absolute right-0 top-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
-                     <lucide-icon [name]="History" [size]="100"></lucide-icon>
+                class="group relative h-32 md:h-40 bg-[#191c24] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
+                 <div class="absolute right-0 top-0 p-4 md:p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
+                     <lucide-icon [name]="History" [size]="80"></lucide-icon>
                  </div>
                  <div class="relative z-10 h-full flex flex-col justify-center">
-                     <h2 class="text-2xl font-bold text-white">Libro de historial digital</h2>
-                     <p class="text-slate-300 font-medium text-sm mt-1 bg-black/20 w-fit px-2 py-1 rounded">(En prueba, no utilizar)</p>
+                     <h2 class="text-xl md:text-2xl font-bold text-white leading-tight">Historial<br class="hidden md:block"> Digital</h2>
+                     <p class="text-slate-300 font-medium text-[10px] mt-1 bg-black/20 w-fit px-2 py-1 rounded">Beta</p>
                  </div>
              </button>
 
              <!-- VOR Error Card -->
              <button (click)="setView('VOR')" 
-                class="group relative h-40 bg-gradient-to-r from-[#a05ce8] to-[#8d3ce3] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
-                 <div class="absolute right-0 top-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
-                     <lucide-icon [name]="Activity" [size]="100"></lucide-icon>
+                class="group relative h-32 md:h-40 bg-gradient-to-r from-[#a05ce8] to-[#8d3ce3] rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all border border-white/10 overflow-hidden text-left p-6">
+                 <div class="absolute right-0 top-0 p-4 md:p-6 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
+                     <lucide-icon [name]="Activity" [size]="80"></lucide-icon>
                  </div>
                  <div class="relative z-10 h-full flex flex-col justify-center">
-                     <h2 class="text-2xl font-bold text-white">VOR - Curva de error</h2>
-                     <p class="text-violet-200 font-medium">Distribuido</p>
+                     <h2 class="text-xl md:text-2xl font-bold text-white leading-tight">VOR - Curva<br class="hidden md:block"> de Error</h2>
+                     <p class="text-violet-200 text-xs md:text-sm font-medium">Distribuido</p>
                  </div>
              </button>
 
@@ -101,12 +101,12 @@ type NavView = 'MENU' | 'CHECKLIST' | 'VOR' | 'DOCS' | 'HISTORY';
 
 
         <!-- SUB VIEWS -->
-        <div *ngIf="currentView !== 'MENU'" class="relative flex-1">
+        <div *ngIf="currentView !== 'MENU'" class="relative flex-1 pb-10">
             
             <!-- CHECKLISTS / EQUIPOS VIEW -->
             <div *ngIf="currentView === 'CHECKLIST'">
                 <!-- Loading State -->
-                <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div *ngIf="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                      <app-skeleton-loader *ngFor="let i of [1,2,3,4]" class="h-48 rounded-xl"></app-skeleton-loader>
                 </div>
                 <!-- Content -->
