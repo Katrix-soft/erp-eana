@@ -119,6 +119,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         }
 
         this.selectedRoom = room;
+        localStorage.setItem('last_chat_room', room.id.toString());
         this.messages = [];
         this.loadMessages(room.id);
         this.chatService.joinRoomWebSocket(room.id);

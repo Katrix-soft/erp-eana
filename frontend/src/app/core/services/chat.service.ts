@@ -144,9 +144,12 @@ export class ChatService {
         }
 
         this.socket = io(`${environment.socketUrl}/chat`, {
-            path: '/socket.io/', // Default path
-            transports: ['websocket'],
+            path: '/socket.io/',
+            transports: ['polling', 'websocket'], // Allow polling for faster initial connection
             autoConnect: true,
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
             auth: {
                 token: token
             }
@@ -154,11 +157,19 @@ export class ChatService {
 
         this.socket.on('connect', () => {
             console.log('WebSocket conectado');
-            // 'authenticate' event is no longer needed as handshake auth is used
+            // Re-join active room if any after reconnection
+            const activeRoomId = localStorage.getItem('last_chat_room');
+            if (activeRoomId) {
+                this.joinRoomWebSocket(parseInt(activeRoomId, 10));
+            }
         });
 
         this.socket.on('connect_error', (err) => {
             console.error('WebSocket connection error:', err);
+            // Fallback to polling if websocket fails
+            if (this.socket) {
+                this.socket.io.opts.transports = ['polling', 'websocket'];
+            }
         });
 
         this.socket.on('newMessage', (message: ChatMessage) => {
