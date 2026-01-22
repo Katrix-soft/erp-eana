@@ -188,6 +188,7 @@ export class VhfEquiposService {
         }
 
         const equipos = await qb.getMany();
+        console.log(`📡 VhfEquiposService.findAll: Found ${equipos.length} equipments`);
 
         // Normalization
         const allAirports = await this.aeropuertoRepository.find();
@@ -201,7 +202,8 @@ export class VhfEquiposService {
         const getCanonicalAirportData = (raw: string | undefined | null) => {
             if (!raw) return null;
             const clean = raw.trim().toUpperCase();
-            if (clean === 'DOZ') return airportMap.get('MENDOZA');
+            if (clean === 'DOZ' || clean === 'SAME') return airportMap.get('MENDOZA');
+            if (clean === 'EZE' || clean === 'SAEZ') return airportMap.get('EZEIZA');
             return airportMap.get(clean);
         };
 
@@ -220,7 +222,15 @@ export class VhfEquiposService {
                 }
             }
 
-            const frecuencia = equipo.frecuencias?.[0]?.frecuencia || null;
+            // Extract frequency: try relation first, then fallback to original property if it somehow exists
+            const frecuencia = equipo.frecuencias && equipo.frecuencias.length > 0
+                ? equipo.frecuencias[0].frecuencia
+                : (equipo.frecuencia || null);
+
+            if (!frecuencia) {
+                console.warn(`⚠️ Equipment ${equipo.id} (${equipo.marca} ${equipo.modelo}) has NO frequency associated.`);
+            }
+
             const lastChecklistDate = equipo.createdAt; // Temporary fallback
 
             return {
