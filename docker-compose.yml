@@ -4,7 +4,11 @@ services:
     container_name: cns_redis
     restart: always
     command: >
-      redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru --save "" --appendonly no
+      redis-server
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
     networks:
       - internal
     healthcheck:
@@ -18,15 +22,15 @@ services:
     container_name: cns_postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
-      POSTGRES_DB: cns_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -43,16 +47,16 @@ services:
 
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
-      POSTGRES_DB: cns_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
 
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_TTL: 300
       CACHE_ENABLED: "true"
 
-      CORS_ORIGIN: "https://app.katrix.com.ar"
+      CORS_ORIGIN: ${CORS_ORIGIN}
 
       JWT_SECRET: ${JWT_SECRET}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
@@ -61,11 +65,16 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
     networks:
       - internal
       - npm_network
-    volumes:
-      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   frontend:
     build:
@@ -78,6 +87,11 @@ services:
     networks:
       - internal
       - npm_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 networks:
   internal:
