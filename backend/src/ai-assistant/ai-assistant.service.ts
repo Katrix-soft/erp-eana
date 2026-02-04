@@ -312,15 +312,19 @@ DIRECTRICES:
 
   private async generateContentWithBackoff(model: any, contents: any[]): Promise<any> {
     let delay = 2000;
+    let lastError: any;
     for (let i = 0; i < 3; i++) {
       try { return await model.generateContent({ contents }); }
       catch (e: any) {
+        lastError = e;
         if (e.status === 429) {
+          this.logger.warn(`⚠️ Gemini 429 (Quota Exceeded) - Retry ${i + 1}/3`);
           await new Promise(r => setTimeout(r, delay));
           delay *= 2;
         } else throw e;
       }
     }
+    throw lastError || new Error('Gemini retries exhausted');
   }
 
   private async uploadToGemini(filePath: string, mimeType: string, displayName: string): Promise<string> {
