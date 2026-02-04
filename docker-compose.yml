@@ -10,7 +10,7 @@ services:
       --save ""
       --appendonly no
     networks:
-      - internal
+      - erp-eana_internal
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -28,7 +28,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - internal
+      - erp-eana_internal
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 30s
@@ -68,7 +68,7 @@ services:
     volumes:
       - uploads_data:/app/uploads
     networks:
-      - internal
+      - erp-eana_internal
       - npm_network
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
@@ -85,16 +85,16 @@ services:
     depends_on:
       - backend
     networks:
-      - internal
+      - erp-eana_internal
       - npm_network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
       interval: 30s
       timeout: 5s
       retries: 3
 
 networks:
-  internal:
+  erp-eana_internal:
     driver: bridge
   npm_network:
     external: true
