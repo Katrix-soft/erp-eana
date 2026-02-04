@@ -112,7 +112,7 @@ networks:
   internal:
     driver: bridge
   npm_network:
-    driver: bridge
+    external: true
 
 volumes:
   postgres_data:
