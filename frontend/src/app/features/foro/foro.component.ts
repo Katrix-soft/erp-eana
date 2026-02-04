@@ -5,11 +5,13 @@ import { RouterModule } from '@angular/router';
 import { ForoService, ForoPost, CreateForoPostDto } from '../../core/services/foro.service';
 import { AuthService } from '../../core/services/auth.service';
 import { finalize } from 'rxjs/operators';
+import { ToastService } from '../../core/services/toast.service';
+import { ToastContainerComponent } from '../../shared/components/toast-container/toast-container.component';
 
 @Component({
     selector: 'app-foro',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, RouterModule, ToastContainerComponent],
     templateUrl: './foro.component.html',
     styleUrls: ['./foro.component.css']
 })
@@ -34,7 +36,8 @@ export class ForoComponent implements OnInit {
     constructor(
         private foroService: ForoService,
         private authService: AuthService,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private toastService: ToastService
     ) { }
 
     ngOnInit(): void {
@@ -122,14 +125,14 @@ export class ForoComponent implements OnInit {
                 this.posts.unshift(post);
                 this.closeNewPostModal();
                 this.loading = false;
-                alert('¡Post publicado con éxito!');
+                this.toastService.success('¡Post publicado con éxito!');
                 this.cd.detectChanges();
             },
             error: (error) => {
                 console.error('Error creando post:', error);
                 this.loading = false;
                 const msg = error.error?.message || 'Error al publicar. Verifica que el título tenga al menos 3 letras y el contenido 10.';
-                alert(msg);
+                this.toastService.error(msg);
             }
         });
     }
@@ -209,11 +212,11 @@ export class ForoComponent implements OnInit {
             next: () => {
                 this.posts = this.posts.filter(p => p.id !== post.id);
                 this.closePostDetail();
-                alert('Post eliminado correctamente');
+                this.toastService.success('Post eliminado correctamente');
             },
             error: (error) => {
                 console.error('Error eliminando post:', error);
-                alert('No se pudo eliminar el post.');
+                this.toastService.error('No se pudo eliminar el post.');
             }
         });
     }

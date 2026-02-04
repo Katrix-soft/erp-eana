@@ -29,7 +29,7 @@ export interface Energia {
     providedIn: 'root'
 })
 export class EnergiaService {
-    private http = inject(HttpClient);
+    private http: HttpClient = inject(HttpClient);
     private apiUrl = '/api/v1/energia';
 
     getEquipamientos(filters?: { aeropuerto?: string, fir?: string }): Observable<Energia[]> {

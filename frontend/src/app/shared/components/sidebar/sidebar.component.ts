@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { LucideAngularModule, LayoutDashboard, Radio, Server, Activity, Signal, Radar, LogOut, X, ChevronDown, ChevronRight, MessageSquare, MessageCircle, Gauge, FileText, MapPin, Users, Globe, Briefcase, Zap, Shield, Settings, History, Upload, Wrench } from 'lucide-angular';
-
+import { toObservable } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 
 @Component({
@@ -19,7 +19,7 @@ export class SidebarComponent {
 
     @Output() closeSidebar = new EventEmitter<void>();
 
-    user$ = this.authService.user$;
+    user$ = toObservable(this.authService.user);
     currentPath = '';
     commsOpen = true;
 
@@ -67,7 +67,9 @@ export class SidebarComponent {
     }
 
     isAdmin(user: any): boolean {
-        return user?.role === 'CNS_NACIONAL' || user?.role === 'ADMIN';
+        // Solo CNS_NACIONAL y ADMIN (o futuros roles de jefe) pueden ver el backoffice
+        const allowedRoles = ['CNS_NACIONAL', 'ADMIN', 'JEFE_CNSE', 'JEFE_REGIONAL'];
+        return allowedRoles.includes(user?.role);
     }
 
     isTechnician(user: any): boolean {
@@ -75,27 +77,12 @@ export class SidebarComponent {
     }
 
     isOneSectorOnly(user: any): boolean {
-        // Logica: Si es de UN FIR (no tiene aeropuerto o es cabecera) -> devuelve TRUE para restringir
-        // Si es de un aeropuerto del interior -> devuelve FALSE para mostrar TODO
-
-        if (this.isAdmin(user) || !this.isTechnician(user)) return false; // Jefes ven todo
+        if (this.isAdmin(user) || !this.isTechnician(user)) return false;
 
         const firsCabeceras = ['EZE', 'CBA', 'CRV', 'DOZ', 'SIS', 'RES'];
         const aeropuertoCode = user?.context?.aeropuerto;
-        const firCode = user?.context?.firDirecto; // FIR asignado directamente sin aeropuerto
 
-        // Si es Personal de FIR puro (sin aeropuerto) o Aeropuerto es Cabecera
-        if (!aeropuertoCode) return true; // Es FIR puro
-
-        // Check si el aeropuerto es cabecera (su codigo suele ser igual al del FIR o esta en lista)
-        // Simplification: EZE, CBA, CRV, DOZ, SIS/RES
-        // Malargue (MLG) != DOZ -> false
-        // Mendoza (DOZ) == DOZ -> true
-        // San Rafael (AFA) != DOZ -> false
-
-        // Necesitamos saber si el aeropuerto es cabecera.
-        // Asumimos que si user.context.aeropuerto (codigo) coincide con alguno de la lista de cabeceras/FIRs.
-        // O si el nombre del aeropuerto contiene "FIR".
+        if (!aeropuertoCode) return true;
 
         return firsCabeceras.includes(aeropuertoCode);
     }
@@ -105,7 +92,7 @@ export class SidebarComponent {
         if (this.isOneSectorOnly(user)) {
             return user.context.sector === 'CNSE' ? 'CNSE' : user.context.sector;
         }
-        return 'CNSE'; // Para aeropuertos chicos, titulo generico
+        return 'CNSE';
     }
 
     isCommsActive(): boolean {

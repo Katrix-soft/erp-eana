@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;700&display=swap');
-
 .freq-font {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Courier New', 'Consolas', monospace;
 }
 
 .radio-texture {

@@ -26,6 +26,12 @@ export class Aeropuerto {
     @Column({ name: 'fir_id' })
     firId: number;
 
+    @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+    latitud: number;
+
+    @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+    longitud: number;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

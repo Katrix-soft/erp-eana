@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Put, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Put, Get, Param, Ip } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto, ForgotPasswordDto, ResetPasswordDto, UpdateProfileDto } from './dto/password.dto';
@@ -12,11 +12,12 @@ export class AuthController {
 
     @Post('login')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'User login' })
+    @ApiOperation({ summary: 'User login with rate limiting' })
     @ApiResponse({ status: 200, description: 'Return JWT access token.' })
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    async login(@Body() loginDto: LoginDto) {
-        return this.authService.login(loginDto);
+    @ApiResponse({ status: 429, description: 'Too many requests - Rate limited.' })
+    async login(@Body() loginDto: LoginDto, @Ip() ip: string) {
+        return this.authService.login(loginDto, ip);
     }
 
     @Post('change-password')

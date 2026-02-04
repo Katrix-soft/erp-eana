@@ -10,10 +10,12 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService, SendMessageDto } from './chat.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @WebSocketGateway({
     cors: {
-        origin: '*', // TODO: Restrict in production via environment
+        origin: process.env.CORS_ORIGIN || '*',
+        credentials: true,
     },
     namespace: '/chat',
 })

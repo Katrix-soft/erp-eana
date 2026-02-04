@@ -35,18 +35,28 @@
       </div>
     </div>
 
-    <h2 class="text-3xl font-bold text-white mb-4">Acceso Denegado</h2>
+    <h2 class="text-3xl font-bold text-white mb-4">{{ isBlocked ? 'Acceso Bloqueado' : 'Acceso Denegado' }}</h2>
     <p class="text-red-300 text-lg mb-2">{{ errorMessage }}</p>
-    <p class="text-blue-200 text-sm mb-8">Verifique sus credenciales e intente nuevamente.</p>
+    <p *ngIf="!isBlocked" class="text-blue-200 text-sm mb-8">Verifique sus credenciales e intente nuevamente.</p>
+
+    <!-- Countdown Timer - Solo cuando bloqueado -->
+    <div *ngIf="isBlocked" class="mb-8">
+      <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/20">
+        <div class="text-6xl font-bold text-white mb-2 font-mono">
+          {{ retryCountdown }}s
+        </div>
+        <p class="text-blue-200 text-sm">Sistema de protección anti-brute-force activo</p>
+      </div>
+    </div>
 
     <!-- Retry Button -->
-    <button (click)="retry()"
-      class="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group">
+    <button (click)="retry()" [disabled]="isBlocked"
+      class="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
       </svg>
-      Volver a Intentar
+      {{ isBlocked ? 'Espere...' : 'Volver a Intentar' }}
     </button>
 
     <div class="mt-6 flex justify-center gap-2">

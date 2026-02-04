@@ -1,3 +1,4 @@
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, ILike, Brackets } from 'typeorm';
@@ -24,8 +25,9 @@ export class VhfEquiposService {
             .leftJoinAndSelect('equipo.vhf', 'vhf');
 
         if (!isGlobalAdmin) {
+            const userId = Number(user.userId || user.sub);
             const personal = await this.personalRepository.findOne({
-                where: { userId: Number(user.userId) },
+                where: { userId: userId },
                 relations: ['aeropuerto', 'fir']
             });
 
@@ -78,32 +80,37 @@ export class VhfEquiposService {
 
         // Normalization Logic
         const allAirports = await this.aeropuertoRepository.find({
-            select: ['nombre', 'codigo']
+            select: ['nombre', 'codigo', 'latitud', 'longitud']
         });
 
-        const airportMap = new Map<string, string>();
+        const airportMap = new Map<string, any>();
         allAirports.forEach(a => {
-            if (a.codigo) airportMap.set(a.codigo.toUpperCase(), a.nombre);
-            if (a.nombre) airportMap.set(a.nombre.toUpperCase(), a.nombre);
+            const data = { nombre: a.nombre, latitud: a.latitud, longitud: a.longitud };
+            if (a.codigo) airportMap.set(a.codigo.toUpperCase(), data);
+            if (a.nombre) airportMap.set(a.nombre.toUpperCase(), data);
         });
 
-        const getCanonicalAirportName = (raw: string | undefined | null) => {
-            if (!raw) return 'Sin Aeropuerto';
+        const getCanonicalAirportData = (raw: string | undefined | null) => {
+            if (!raw) return { name: 'Sin Aeropuerto', latitud: null, longitud: null };
             const clean = raw.trim().toUpperCase();
-            if (clean === 'DOZ') return 'Mendoza';
-            return airportMap.get(clean) || raw;
+            if (clean === 'DOZ') return airportMap.get('MENDOZA') || { name: 'Mendoza', latitud: -32.8317, longitud: -68.7929 };
+            const found = airportMap.get(clean);
+            return found ? { name: found.nombre, latitud: found.latitud, longitud: found.longitud } : { name: raw, latitud: null, longitud: null };
         };
 
         const groupedByAirport = new Map<string, any>();
 
         equipos.forEach(equipo => {
             const rawAirport = equipo.vhf?.aeropuerto || 'Sin Aeropuerto';
-            const airportCode = getCanonicalAirportName(rawAirport);
+            const airportInfo = getCanonicalAirportData(rawAirport);
+            const airportName = airportInfo.name;
             const fir = equipo.vhf?.fir || 'Sin FIR';
 
-            if (!groupedByAirport.has(airportCode)) {
-                groupedByAirport.set(airportCode, {
-                    name: airportCode,
+            if (!groupedByAirport.has(airportName)) {
+                groupedByAirport.set(airportName, {
+                    name: airportName,
+                    latitud: airportInfo.latitud,
+                    longitud: airportInfo.longitud,
                     fir: fir,
                     totalEquipments: 0,
                     operationalCount: 0,
@@ -113,7 +120,7 @@ export class VhfEquiposService {
                 });
             }
 
-            const airportData = groupedByAirport.get(airportCode);
+            const airportData = groupedByAirport.get(airportName);
             airportData.totalEquipments++;
 
             const tipo = equipo.tipoEquipo || 'Otros';
@@ -139,22 +146,22 @@ export class VhfEquiposService {
             return { ...airport, availability };
         });
 
-        console.log(`✅ Estadísticas generadas para ${result.length} aeropuertos (Normalizado)`);
+        console.log(`✅ Estadísticas generadas for ${result.length} aeropuertos (Mapeado)`);
         return result;
     }
 
     async findAll(user: any, filters?: { sector?: string; aeropuerto?: string; fir?: string }) {
         const isGlobalAdmin = ['ADMIN', 'CNS_NACIONAL'].includes(user.role);
+        const userId = Number(user.userId || user.sub);
 
         const qb = this.equipoRepository.createQueryBuilder('equipo')
             .leftJoinAndSelect('equipo.vhf', 'vhf')
             .leftJoinAndSelect('equipo.frecuencias', 'frecuencias')
-            // .leftJoinAndSelect('equipo.checklists', 'checklists') // Assuming relation exists
             .orderBy('equipo.createdAt', 'DESC');
 
         if (!isGlobalAdmin) {
             const personal = await this.personalRepository.findOne({
-                where: { userId: Number(user.userId) },
+                where: { userId: userId },
                 relations: ['aeropuerto', 'fir']
             });
 
@@ -177,8 +184,8 @@ export class VhfEquiposService {
             if (filters?.aeropuerto) {
                 const val = filters.aeropuerto.trim();
                 qb.andWhere(new Brackets(qb2 => {
-                    qb2.where('vhf.aeropuerto ILIKE :val', { val })
-                        .orWhere('vhf.sitio ILIKE :val', { val });
+                    qb2.where('vhf.aeropuerto ILIKE :val', { val: `%${val}%` })
+                        .orWhere('vhf.sitio ILIKE :val', { val: `%${val}%` });
                 }));
             }
             if (filters?.fir) {
@@ -190,7 +197,6 @@ export class VhfEquiposService {
         const equipos = await qb.getMany();
         console.log(`📡 VhfEquiposService.findAll: Found ${equipos.length} equipments`);
 
-        // Normalization
         const allAirports = await this.aeropuertoRepository.find();
         const airportMap = new Map<string, { name: string, id: number, firId: number }>();
         allAirports.forEach(a => {
@@ -222,16 +228,9 @@ export class VhfEquiposService {
                 }
             }
 
-            // Extract frequency: try relation first, then fallback to original property if it somehow exists
             const frecuencia = equipo.frecuencias && equipo.frecuencias.length > 0
                 ? equipo.frecuencias[0].frecuencia
                 : (equipo.frecuencia || null);
-
-            if (!frecuencia) {
-                console.warn(`⚠️ Equipment ${equipo.id} (${equipo.marca} ${equipo.modelo}) has NO frequency associated.`);
-            }
-
-            const lastChecklistDate = equipo.createdAt; // Temporary fallback
 
             return {
                 ...equipo,
@@ -241,7 +240,7 @@ export class VhfEquiposService {
                     firId
                 },
                 frecuencia,
-                lastChecklistDate
+                lastChecklistDate: equipo.createdAt
             };
         });
     }

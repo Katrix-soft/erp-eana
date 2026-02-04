@@ -25,7 +25,7 @@ export interface Vigilancia {
     providedIn: 'root'
 })
 export class VigilanciaService {
-    private http = inject(HttpClient);
+    private http: HttpClient = inject(HttpClient);
     private apiUrl = '/api/v1/vigilancia';
 
     getEquipamientos(filters?: { aeropuerto?: string, fir?: string }): Observable<Vigilancia[]> {

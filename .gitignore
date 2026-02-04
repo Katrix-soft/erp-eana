@@ -6,16 +6,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment
+# Environment - CRITICAL: Never commit these
 .env
 .env.local
 .env.*.local
+.env.production
+backend/.env
+backend/.env.production
+backend/.env.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
-*.swo
+.swo
 
 # OS
 .DS_Store
@@ -23,3 +27,28 @@ Thumbs.db
 
 # Docker
 .dockerignore
+
+# Uploads and Data
+backend/uploads/
+uploads/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Database dumps
+*.sql
+*.dump
+
+# Backups
+backup_*
+*_backup
+
+# Sensitive files
+*.pem
+*.key
+*.cert
+*.crt
+secrets/
+

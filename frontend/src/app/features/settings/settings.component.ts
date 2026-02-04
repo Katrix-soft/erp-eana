@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings.service';
+import { ToastService } from '../../core/services/toast.service';
 import { LucideAngularModule, Save, Clock, AlertTriangle } from 'lucide-angular';
 
 @Component({
@@ -14,6 +15,7 @@ import { LucideAngularModule, Save, Clock, AlertTriangle } from 'lucide-angular'
 export class SettingsComponent implements OnInit {
     private fb = inject(FormBuilder);
     private settingsService = inject(SettingsService);
+    private toastService = inject(ToastService);
 
     form: FormGroup;
     loading = true;
@@ -57,12 +59,12 @@ export class SettingsComponent implements OnInit {
         this.settingsService.updateSettings('checklist_expiration_days', this.form.value.checklist_expiration_days).subscribe({
             next: () => {
                 this.saving = false;
-                alert('Configuración guardada correctamente');
+                this.toastService.success('Configuración guardada correctamente');
             },
             error: (err: any) => {
                 console.error(err);
                 this.saving = false;
-                alert('Error al guardar la configuración');
+                this.toastService.error('Error al guardar la configuración');
             }
         });
     }

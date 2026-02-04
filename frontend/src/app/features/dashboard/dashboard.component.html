@@ -9,16 +9,21 @@
   <ng-container *ngIf="stats">
     <!-- Header -->
     <div
-      class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5">
-      <div class="flex items-center gap-4">
-        <div class="p-3 bg-blue-600/20 rounded-2xl text-blue-400 shadow-inner">
+      class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 glass p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden">
+
+      <!-- Decorative Glow -->
+      <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-600/10 blur-[80px]"></div>
+
+      <div class="flex items-center gap-4 relative z-10">
+        <div class="p-3 bg-blue-600/20 rounded-2xl text-blue-400 shadow-inner animate-float">
           <lucide-icon [name]="LayoutDashboard" [size]="32"></lucide-icon>
         </div>
         <div>
-          <h1 class="text-3xl font-black text-white tracking-tight">Panel de Control</h1>
-          <p class="text-slate-400 font-medium">
-            {{ isAdmin ? 'Resumen General del Sistema CNS/EANA' : 'Bienvenido ' + (user.context?.nombre || '') + ' - ' +
-            (stats.context?.aeropuerto || stats.context?.fir || 'Sector Asignado') }}
+          <h1 class="text-3xl font-black text-white tracking-tight text-glow">Panel de Control</h1>
+          <p class="text-slate-400 font-medium text-sm">
+            {{ isAdmin ? 'Estrategia Digital y Visualización de Activos CNS' : 'Bienvenido ' + (user.context?.nombre ||
+            '') + ' - ' +
+            (stats.context?.aeropuerto || stats.context?.fir || 'Sector CNS Asignado') }}
           </p>
         </div>
       </div>
@@ -44,33 +49,36 @@
             class="text-white/5" />
           <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent"
             class="text-blue-500 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-            [attr.stroke-dasharray]="364.4"
-            [attr.stroke-dashoffset]="364.4 - (364.4 * (stats.global.operational / stats.global.total))" />
+            [attr.stroke-dasharray]="364.4" [attr.stroke-dashoffset]="364.4 - (364.4 * (getPercent() / 100))" />
         </svg>
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <span class="text-3xl font-black text-white">{{ Math.round((stats.global.operational / stats.global.total) *
-            100) }}%</span>
+          <span class="text-3xl font-black text-white">{{ getPercent() }}%</span>
           <span class="text-[8px] font-black text-slate-500 uppercase tracking-tighter">Operativo</span>
         </div>
       </div>
       <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="space-y-1">
           <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Equipamiento Total</p>
-          <p class="text-3xl font-black text-white">{{ stats.global.total }}</p>
+          <p class="text-3xl font-black text-white" id="stat-total">{{ (stats?.global?.total || 0) }}</p>
         </div>
         <div class="space-y-1">
           <p class="text-xs font-bold text-emerald-500/70 uppercase tracking-widest">Sistemas OK</p>
-          <p class="text-3xl font-black text-emerald-400">{{ stats.global.operational }}</p>
+          <p class="text-3xl font-black text-emerald-400" id="stat-ok">{{ (stats?.global?.operational || 0) }}</p>
         </div>
         <div class="space-y-1">
           <p class="text-xs font-bold text-yellow-500/70 uppercase tracking-widest">Novedades</p>
-          <p class="text-3xl font-black text-yellow-400">{{ stats.global.warning }}</p>
+          <p class="text-3xl font-black text-yellow-400" id="stat-warning">{{ (stats?.global?.warning || 0) }}</p>
         </div>
         <div class="space-y-1">
           <p class="text-xs font-bold text-red-500/70 uppercase tracking-widest">Fuera de Servicio</p>
-          <p class="text-3xl font-black text-red-500">{{ stats.global.danger }}</p>
+          <p class="text-3xl font-black text-red-500" id="stat-danger">{{ (stats?.global?.danger || 0) }}</p>
         </div>
       </div>
+    </div>
+
+    <!-- Interactive CNS Map -->
+    <div class="mt-8 animate-in fade-in zoom-in duration-700" *ngIf="showStrategicMap">
+      <app-cns-map [airports]="allAirports"></app-cns-map>
     </div>
 
     <!-- Systems Grid -->
@@ -78,88 +86,97 @@
 
       <!-- Comms -->
       <div routerLink="/comunicaciones"
-        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-blue-500/50 transition-all cursor-pointer">
+        class="group glass p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-blue-500/50 hover:glow-blue transition-all duration-500 cursor-pointer">
         <div
-          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-blue-500/10 blur-2xl group-hover:bg-blue-500/20 transition-all">
+          class="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full bg-blue-500/10 blur-3xl group-hover:bg-blue-500/30 transition-all duration-700">
         </div>
         <div class="relative z-10 flex flex-col h-full">
           <div
-            class="p-3 rounded-xl bg-blue-500/10 text-blue-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/5">
+            class="p-3 rounded-xl bg-blue-500/10 text-blue-400 w-fit mb-4 group-hover:scale-110 group-hover:bg-blue-600/20 transition-all duration-500 shadow-lg shadow-blue-500/5">
             <lucide-icon [name]="Radio" [size]="24"></lucide-icon>
           </div>
-          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Comunicaciones</h3>
-          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.comms.total }} <span
-              class="text-sm font-medium text-slate-500">Equipos</span></p>
+          <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Comunicaciones</h3>
+          <p class="text-3xl font-black text-white mb-4 group-hover:text-glow transition-all">{{
+            stats.categories.comms.total }} <span class="text-sm font-medium text-slate-500/60">Equipos</span></p>
           <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.comms.operational }}
-              OK</span>
-            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.comms.danger }} FS</span>
+            <span class="text-[10px] font-black text-emerald-500 uppercase flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ stats.categories.comms.operational }}
+              OK
+            </span>
+            <span class="text-[10px] font-black text-red-500/80 uppercase">{{ stats.categories.comms.danger }}
+              Falla</span>
           </div>
         </div>
       </div>
 
       <!-- Nav -->
       <div routerLink="/navegacion"
-        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-emerald-500/50 transition-all cursor-pointer">
+        class="group glass p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-emerald-500/50 hover:glow-emerald transition-all duration-500 cursor-pointer">
         <div
-          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-emerald-500/10 blur-2xl group-hover:bg-emerald-500/20 transition-all">
+          class="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full bg-emerald-500/10 blur-3xl group-hover:bg-emerald-500/30 transition-all duration-700">
         </div>
         <div class="relative z-10 flex flex-col h-full">
           <div
-            class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/5">
+            class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 w-fit mb-4 group-hover:scale-110 group-hover:bg-emerald-600/20 transition-all duration-500 shadow-lg shadow-emerald-500/5">
             <lucide-icon [name]="Server" [size]="24"></lucide-icon>
           </div>
-          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Navegación</h3>
-          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.nav.total }} <span
-              class="text-sm font-medium text-slate-500">Facilidades</span></p>
+          <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Navegación</h3>
+          <p class="text-3xl font-black text-white mb-4 group-hover:text-glow transition-all">{{
+            stats.categories.nav.total }} <span class="text-sm font-medium text-slate-500/60">Servicios</span></p>
           <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.nav.operational }}
-              OK</span>
-            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.nav.danger }} FS</span>
+            <span class="text-[10px] font-black text-emerald-500 uppercase flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ stats.categories.nav.operational }} OK
+            </span>
+            <span class="text-[10px] font-black text-red-500/80 uppercase">{{ stats.categories.nav.danger }}
+              Falla</span>
           </div>
         </div>
       </div>
 
       <!-- Vig -->
       <div routerLink="/vigilancia"
-        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-violet-500/50 transition-all cursor-pointer">
+        class="group glass p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-violet-500/50 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] transition-all duration-500 cursor-pointer">
         <div
-          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-violet-500/10 blur-2xl group-hover:bg-violet-500/20 transition-all">
+          class="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full bg-violet-500/10 blur-3xl group-hover:bg-violet-500/30 transition-all duration-700">
         </div>
         <div class="relative z-10 flex flex-col h-full">
           <div
-            class="p-3 rounded-xl bg-violet-500/10 text-violet-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-violet-500/5">
+            class="p-3 rounded-xl bg-violet-500/10 text-violet-400 w-fit mb-4 group-hover:scale-110 group-hover:bg-violet-600/20 transition-all duration-500 shadow-lg shadow-violet-500/5">
             <lucide-icon [name]="Activity" [size]="24"></lucide-icon>
           </div>
-          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Vigilancia</h3>
-          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.vig.total }} <span
-              class="text-sm font-medium text-slate-500">Sistemas</span></p>
+          <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Vigilancia</h3>
+          <p class="text-3xl font-black text-white mb-4 group-hover:text-glow transition-all">{{
+            stats.categories.vig.total }} <span class="text-sm font-medium text-slate-500/60">Sistemas</span></p>
           <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.vig.operational }}
-              OK</span>
-            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.vig.danger }} FS</span>
+            <span class="text-[10px] font-black text-emerald-500 uppercase flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ stats.categories.vig.operational }} OK
+            </span>
+            <span class="text-[10px] font-black text-red-500/80 uppercase">{{ stats.categories.vig.danger }}
+              Falla</span>
           </div>
         </div>
       </div>
 
       <!-- Energy -->
       <div routerLink="/energia"
-        class="group bg-slate-900/40 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-yellow-500/50 transition-all cursor-pointer">
+        class="group glass p-6 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden hover:border-yellow-500/50 hover:glow-yellow transition-all duration-500 cursor-pointer">
         <div
-          class="absolute top-0 right-0 w-20 h-20 -mr-4 -mt-4 rounded-full bg-yellow-500/10 blur-2xl group-hover:bg-yellow-500/20 transition-all">
+          class="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full bg-yellow-500/10 blur-3xl group-hover:bg-yellow-500/30 transition-all duration-700">
         </div>
         <div class="relative z-10 flex flex-col h-full">
           <div
-            class="p-3 rounded-xl bg-yellow-500/10 text-yellow-400 w-fit mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-yellow-500/5">
+            class="p-3 rounded-xl bg-yellow-500/10 text-yellow-400 w-fit mb-4 group-hover:scale-110 group-hover:bg-yellow-600/20 transition-all duration-500 shadow-lg shadow-yellow-500/5">
             <lucide-icon [name]="Zap" [size]="24"></lucide-icon>
           </div>
-          <h3 class="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">Energía</h3>
-          <p class="text-3xl font-black text-white mb-4">{{ stats.categories.ener.total }} <span
-              class="text-sm font-medium text-slate-500">Infraestr.</span></p>
+          <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Energía</h3>
+          <p class="text-3xl font-black text-white mb-4 group-hover:text-glow transition-all">{{
+            stats.categories.ener.total }} <span class="text-sm font-medium text-slate-500/60">Activos</span></p>
           <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
-            <span class="text-[10px] font-bold text-emerald-500 uppercase">{{ stats.categories.ener.operational }}
-              OK</span>
-            <span class="text-[10px] font-bold text-red-500 uppercase">{{ stats.categories.ener.danger }} FS</span>
+            <span class="text-[10px] font-black text-emerald-500 uppercase flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ stats.categories.ener.operational }} OK
+            </span>
+            <span class="text-[10px] font-black text-red-500/80 uppercase">{{ stats.categories.ener.danger }}
+              Falla</span>
           </div>
         </div>
       </div>
@@ -181,12 +198,12 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div *ngFor="let airport of group[1]" (click)="navigateToAirport(airport.name)"
-            class="group bg-slate-900/60 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-white/5 flex flex-col hover:border-blue-500/40 transition-all duration-300 cursor-pointer relative overflow-hidden">
+            class="group glass p-6 rounded-2xl shadow-2xl border border-white/5 flex flex-col hover:border-blue-500/40 hover:glow-blue transition-all duration-500 cursor-pointer relative overflow-hidden">
 
             <div class="flex items-start justify-between mb-6">
               <div class="flex items-center gap-4">
                 <div
-                  class="p-3 bg-blue-500/10 text-blue-400 rounded-2xl group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500">
+                  class="p-3 bg-blue-500/10 text-blue-400 rounded-2xl group-hover:scale-110 group-hover:bg-blue-600/20 transition-all duration-500 shadow-lg">
                   <lucide-icon [name]="MapPin" [size]="24"></lucide-icon>
                 </div>
                 <div>
@@ -195,42 +212,50 @@
                     {{ airport.name }}</h4>
                   <div class="flex items-center gap-2 mt-1">
                     <span class="w-2 h-2 rounded-full"
-                      [ngClass]="airport.availability >= 90 ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'"></span>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ airport.fir }}</p>
+                      [ngClass]="airport.healthScore >= 90 ? 'bg-emerald-500 animate-pulse' : (airport.healthScore >= 70 ? 'bg-amber-500' : 'bg-red-500')"></span>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">{{ airport.fir }}</p>
                   </div>
                 </div>
+              </div>
+
+              <!-- Health Badge -->
+              <div
+                [ngClass]="airport.healthScore >= 90 ? 'text-emerald-400 bg-emerald-400/10' : 'text-amber-400 bg-amber-400/10'"
+                class="px-2 py-1 rounded-lg border border-current/20 text-[10px] font-black uppercase tracking-tighter">
+                Health: {{ airport.healthScore }}%
               </div>
             </div>
 
             <!-- Mini stats breakdown -->
             <div class="space-y-4">
               <div class="flex justify-between items-end">
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Disponibilidad
-                  Operativa</span>
-                <span class="text-2xl font-black tracking-tighter"
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Disponibilidad
+                  Sistémica</span>
+                <span class="text-2xl font-black tracking-tighter text-glow"
                   [ngClass]="airport.availability >= 90 ? 'text-emerald-400' : 'text-amber-400'">
                   {{ airport.availability }}%
                 </span>
               </div>
               <div class="w-full bg-slate-950/50 rounded-full h-2 overflow-hidden border border-white/5">
                 <div class="h-full rounded-full transition-all duration-1000 ease-out"
-                  [ngClass]="airport.availability >= 90 ? 'bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-amber-500'"
+                  [ngClass]="airport.availability >= 90 ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-amber-500'"
                   [style.width.%]="airport.availability"></div>
               </div>
 
               <div class="flex gap-2 pt-2">
-                <div class="flex-1 bg-slate-950/40 p-3 rounded-xl border border-white/5 flex flex-col items-center">
+                <div
+                  class="flex-1 glass p-3 rounded-xl flex flex-col items-center group-hover:bg-white/5 transition-colors">
                   <span class="text-lg font-black text-white">{{ airport.totalEquipments }}</span>
-                  <span class="text-[8px] font-black text-slate-600 uppercase">Equipos</span>
+                  <span class="text-[8px] font-black text-slate-500 uppercase">Tokens</span>
                 </div>
                 <div
                   class="flex-1 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10 flex flex-col items-center">
                   <span class="text-lg font-black text-emerald-400">{{ airport.operationalCount }}</span>
-                  <span class="text-[8px] font-black text-emerald-600/70 uppercase">Online</span>
+                  <span class="text-[8px] font-black text-emerald-600/70 uppercase">Activos</span>
                 </div>
                 <div class="flex-1 bg-red-500/5 p-3 rounded-xl border border-red-500/10 flex flex-col items-center">
                   <span class="text-lg font-black text-red-400">{{ airport.errorCount }}</span>
-                  <span class="text-[8px] font-black text-red-600/70 uppercase">Falla</span>
+                  <span class="text-[8px] font-black text-red-600/70 uppercase">Alertas</span>
                 </div>
               </div>
             </div>
@@ -239,15 +264,15 @@
             <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
               <div class="flex -space-x-2">
                 <div *ngFor="let tech of airport.technicians.slice(0, 3)" [title]="tech"
-                  class="w-6 h-6 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-[8px] font-black text-blue-400 uppercase">
+                  class="w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-[8px] font-black text-blue-400 uppercase hover:scale-110 hover:z-10 transition-all cursor-help">
                   {{ tech.substring(0, 2) }}
                 </div>
                 <div *ngIf="airport.technicians.length > 3"
-                  class="w-6 h-6 rounded-full bg-slate-700 border-2 border-slate-900 flex items-center justify-center text-[8px] font-black text-slate-300">
+                  class="w-7 h-7 rounded-full bg-slate-700 border-2 border-slate-900 flex items-center justify-center text-[8px] font-black text-slate-300">
                   +{{ airport.technicians.length - 3 }}
                 </div>
-                <div *ngIf="airport.technicians.length === 0" class="text-[10px] italic text-slate-600">Sin personal
-                  asignado</div>
+                <div *ngIf="airport.technicians.length === 0" class="text-[10px] italic text-slate-500 font-medium">
+                  Buscando técnicos...</div>
               </div>
               <lucide-icon [name]="ChevronRight" [size]="16"
                 class="text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></lucide-icon>

@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // import { PrismaModule } from './prisma/prisma.module';
+import { CacheModule } from './cache/cache.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { VhfModule } from './vhf/vhf.module';
@@ -36,12 +37,17 @@ import { VorModule } from './vor/vor.module';
 import { ForoModule } from './foro/foro.module';
 import { ChatModule } from './chat/chat.module';
 import { UploadModule } from './upload/upload.module';
+import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AppController } from './app.controller';
 
 
+
 import { AppService } from './app.service';
+
+// Force Rebuild 2026-02-01
+
 
 @Module({
     imports: [
@@ -52,20 +58,28 @@ import { AppService } from './app.service';
             ttl: 60000,
             limit: 100, // Increased for production handling
         }]),
+        // ✨ Cache Module - Global
+        CacheModule,
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
-            useFactory: (config: ConfigService) => ({
-                type: 'postgres',
-                host: config.get<string>('POSTGRES_HOST', 'localhost'),
-                port: config.get<number>('POSTGRES_PORT', 5434),
-                username: config.get<string>('POSTGRES_USER', 'postgres'),
-                password: config.get<string>('POSTGRES_PASSWORD', 'postgrespassword'),
-                database: config.get<string>('POSTGRES_DB', 'cns_db'),
-                entities: [__dirname + '/**/*.entity{.ts,.js}'],
-                synchronize: true,
-                logging: config.get<string>('NODE_ENV') !== 'production',
-                poolSize: 10,
-            }),
+            useFactory: async (config: ConfigService) => {
+                const cacheEnabled = config.get<string>('CACHE_ENABLED', 'true') === 'true';
+
+                return {
+                    type: 'postgres',
+                    host: config.get<string>('POSTGRES_HOST', 'localhost'),
+                    port: config.get<number>('POSTGRES_PORT', 5434),
+                    username: config.get<string>('POSTGRES_USER', 'postgres'),
+                    password: config.get<string>('POSTGRES_PASSWORD', 'postgrespassword'),
+                    database: config.get<string>('POSTGRES_DB', 'cns_db'),
+                    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+                    synchronize: true,
+                    logging: config.get<string>('NODE_ENV') !== 'production',
+                    poolSize: 10,
+                    // Cache deshabilitado por ahora
+                    cache: false,
+                };
+            },
         }),
         // PrismaModule, // Removed
         AuthModule,
@@ -95,6 +109,7 @@ import { AppService } from './app.service';
         ForoModule,
         ChatModule,
         UploadModule,
+        AiAssistantModule,
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', 'uploads'),
             serveRoot: '/uploads',

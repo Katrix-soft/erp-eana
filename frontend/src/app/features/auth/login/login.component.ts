@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angu
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { LucideAngularModule, Plane, User, Lock, ShieldCheck } from 'lucide-angular';
-import { debounceTime, distinctUntilChanged, switchMap, of, startWith } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, of, startWith, interval } from 'rxjs';
 
 @Component({
     selector: 'app-login',
@@ -28,6 +28,11 @@ export class LoginComponent {
     showErrorScreen = false;
     showDefaultPasswordHint = false;
 
+    // Rate limiting
+    isBlocked = false;
+    retryAfter = 0;
+    retryCountdown = 0;
+
     ngOnInit() {
         this.loginForm.get('email')?.valueChanges.pipe(
             startWith(''),
@@ -35,7 +40,6 @@ export class LoginComponent {
             distinctUntilChanged(),
             switchMap(value => {
                 const identifier = value?.trim();
-                // Si está vacío o es muy corto, no mostramos el mensaje (no sabemos quién es)
                 if (!identifier || identifier.length < 3) return of({ showHint: false });
                 return this.authService.checkDefaultPasswordHint(identifier);
             })
@@ -51,7 +55,7 @@ export class LoginComponent {
     readonly ShieldCheck = ShieldCheck;
 
     onSubmit() {
-        if (this.loginForm.valid) {
+        if (this.loginForm.valid && !this.isBlocked) {
             this.isLoading = true;
             this.errorMessage = '';
             this.showErrorScreen = false;
@@ -68,7 +72,26 @@ export class LoginComponent {
                     console.error('Error en LoginComponent:', err);
                     this.isLoading = false;
                     this.showErrorScreen = true;
-                    if (err.status === 401) {
+
+                    // Manejar rate limiting (429)
+                    if (err.status === 429) {
+                        this.isBlocked = true;
+                        this.retryAfter = err.error?.retryAfter || 300;
+                        this.retryCountdown = this.retryAfter;
+                        this.errorMessage = `Demasiados intentos fallidos. Por favor espere ${this.formatTime(this.retryAfter)}`;
+
+                        // Iniciar countdown
+                        const timer = interval(1000).subscribe(() => {
+                            this.retryCountdown--;
+                            if (this.retryCountdown <= 0) {
+                                this.isBlocked = false;
+                                this.showErrorScreen = false;
+                                timer.unsubscribe();
+                            } else {
+                                this.errorMessage = `Demasiados intentos fallidos. Por favor espere ${this.formatTime(this.retryCountdown)}`;
+                            }
+                        });
+                    } else if (err.status === 401) {
                         this.errorMessage = 'Usuario o contraseña incorrectos. Por favor, intente nuevamente.';
                     } else if (err.status === 404) {
                         this.errorMessage = 'El servidor de autenticación no está disponible.';
@@ -80,10 +103,21 @@ export class LoginComponent {
         }
     }
 
+    formatTime(seconds: number): string {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        if (mins > 0) {
+            return `${mins} minuto${mins > 1 ? 's' : ''} ${secs} segundo${secs !== 1 ? 's' : ''}`;
+        }
+        return `${secs} segundo${secs !== 1 ? 's' : ''}`;
+    }
+
     retry() {
-        this.showErrorScreen = false;
-        this.errorMessage = '';
-        this.loginForm.reset();
+        if (!this.isBlocked) {
+            this.showErrorScreen = false;
+            this.errorMessage = '';
+            this.loginForm.reset();
+        }
     }
 
 }

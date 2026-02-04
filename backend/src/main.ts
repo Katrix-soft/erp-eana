@@ -15,18 +15,34 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ProductionLogger } from './common/logger/production.logger';
 
 async function bootstrap() {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+    // Configure logger based on environment
+    const logger = process.env.NODE_ENV === 'production'
+        ? new ProductionLogger()
+        : undefined;
+
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+        logger: logger || ['log', 'error', 'warn', 'debug', 'verbose'],
+    });
 
     // ...
 
-    // Basic Security
-    // In production, specify your frontend domain: e.g. origin: 'https://cns.eana.com.ar'
+    // CORS Configuration - Secure for production
+    const corsOrigin = process.env.CORS_ORIGIN
+        ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+        : process.env.NODE_ENV === 'production'
+            ? false // Deny all in production if not configured
+            : true; // Allow all in development
+
     app.enableCors({
-        origin: true, // Allow all for now, but recommend restricting in production env vars
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        origin: corsOrigin,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
+        allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
+        exposedHeaders: 'X-Total-Count',
+        maxAge: 3600,
     });
     app.use(helmet());
     app.use(compression());
@@ -56,6 +72,15 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document);
 
     await app.listen(3000, '0.0.0.0');
+
+    const env = process.env.NODE_ENV || 'development';
     console.log(`🚀 Servidor iniciado en puerto 3000`);
+    console.log(`📝 Ambiente: ${env}`);
+    console.log(`📚 API Docs: http://localhost:3000/api/docs`);
+    console.log(`❤️  Health: http://localhost:3000/health`);
+
+    if (env === 'production') {
+        console.log(`📊 Logs guardados en: ./logs/`);
+    }
 }
 bootstrap();

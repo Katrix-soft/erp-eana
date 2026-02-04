@@ -21,6 +21,10 @@ export class WorkOrdersService {
         return this.http.get<WorkOrder>(`${this.apiUrl}/${id}`);
     }
 
+    create(data: Partial<WorkOrder>): Observable<WorkOrder> {
+        return this.http.post<WorkOrder>(this.apiUrl, data);
+    }
+
     update(id: number, data: Partial<WorkOrder>): Observable<WorkOrder> {
         return this.http.put<WorkOrder>(`${this.apiUrl}/${id}`, data);
     }

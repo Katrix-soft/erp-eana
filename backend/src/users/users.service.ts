@@ -1,16 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        @Optional() private cache?: CacheService
     ) { }
 
     async create(createUserDto: CreateUserDto) {
@@ -39,7 +41,24 @@ export class UsersService {
         });
     }
 
-    findOne(id: number) {
+    async findOne(id: number) {
+        if (this.cache) {
+            return this.cache.getOrSet(
+                `user:${id}:data`,
+                () => this.userRepository.findOne({
+                    where: { id },
+                    relations: ['personal'],
+                    select: {
+                        id: true,
+                        email: true,
+                        role: true,
+                        createdAt: true,
+                    }
+                }),
+                300 // 5 minutos
+            );
+        }
+
         return this.userRepository.findOne({
             where: { id },
             relations: ['personal'],
@@ -57,14 +76,29 @@ export class UsersService {
             updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
         }
         await this.userRepository.update(id, updateUserDto);
+
+        // Invalidar caches
+        if (this.cache) {
+            await this.cache.del(`user:${id}:data`).catch(() => { });
+            await this.cache.del(`user:${id}:profile`).catch(() => { });
+        }
+
         return this.findOne(id);
     }
 
     async remove(id: number) {
         const user = await this.findOne(id);
         if (user) {
-            return this.userRepository.remove(user);
+            const result = await this.userRepository.remove(user);
+
+            // Invalidar caches
+            if (this.cache) {
+                await this.cache.del(`user:${id}:data`).catch(() => { });
+                await this.cache.del(`user:${id}:profile`).catch(() => { });
+            }
+
+            return result;
         }
-        return null; // Or throw NotFoundException
+        return null;
     }
 }

@@ -1,29 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Aeropuerto } from './entities/aeropuerto.entity';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class AeropuertosService {
     constructor(
         @InjectRepository(Aeropuerto)
-        private aeropuertoRepository: Repository<Aeropuerto>
+        private aeropuertoRepository: Repository<Aeropuerto>,
+        @Optional() private cache?: CacheService
     ) { }
 
     async create(data: any) {
-        // data usually comes as DTO, assume it matches entity or handle mapping
-        // TypeORM create doesn't assume DTO = entity 1:1 always but mostly yes for keys
         const newItem = this.aeropuertoRepository.create(data);
-        return this.aeropuertoRepository.save(newItem);
+        const result = await this.aeropuertoRepository.save(newItem);
+
+        // Invalidar cache
+        if (this.cache) {
+            await this.cache.del('catalog:aeropuertos:all').catch(() => { });
+        }
+
+        return result;
     }
 
     async findAll() {
-        return this.aeropuertoRepository.find({
-            relations: ['fir']
-        });
+        if (this.cache) {
+            return this.cache.getOrSet(
+                'catalog:aeropuertos:all',
+                () => this.aeropuertoRepository.find({ relations: ['fir'] }),
+                3600 // 1 hora
+            );
+        }
+        return this.aeropuertoRepository.find({ relations: ['fir'] });
     }
 
     async findOne(id: number) {
+        if (this.cache) {
+            return this.cache.getOrSet(
+                `aeropuerto:${id}`,
+                () => this.aeropuertoRepository.findOne({
+                    where: { id },
+                    relations: ['fir']
+                }),
+                1800 // 30 minutos
+            );
+        }
         return this.aeropuertoRepository.findOne({
             where: { id },
             relations: ['fir']
@@ -32,11 +54,25 @@ export class AeropuertosService {
 
     async update(id: number, data: any) {
         await this.aeropuertoRepository.update(id, data);
+
+        // Invalidar caches
+        if (this.cache) {
+            await this.cache.del(`aeropuerto:${id}`).catch(() => { });
+            await this.cache.del('catalog:aeropuertos:all').catch(() => { });
+        }
+
         return this.findOne(id);
     }
 
     async remove(id: number) {
-        // TypeORM remove needs entity, delete needs criteria
-        return this.aeropuertoRepository.delete(id);
+        const result = await this.aeropuertoRepository.delete(id);
+
+        // Invalidar caches
+        if (this.cache) {
+            await this.cache.del(`aeropuerto:${id}`).catch(() => { });
+            await this.cache.del('catalog:aeropuertos:all').catch(() => { });
+        }
+
+        return result;
     }
 }

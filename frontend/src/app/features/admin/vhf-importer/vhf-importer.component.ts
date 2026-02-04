@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { LucideAngularModule, Upload, FileSpreadsheet, CheckCircle, XCircle, Loader2 } from 'lucide-angular';
+import { ToastService } from '../../../core/services/toast.service';
 import * as XLSX from 'xlsx';
 
 interface ImportProgress {
@@ -199,7 +200,10 @@ export class VhfImporterComponent {
         message: ''
     };
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private toastService: ToastService
+    ) { }
 
     handleFileChange(event: Event) {
         const input = event.target as HTMLInputElement;
@@ -211,7 +215,7 @@ export class VhfImporterComponent {
 
     async processExcel() {
         if (!this.file) {
-            alert('Por favor selecciona un archivo');
+            this.toastService.warning('Por favor selecciona un archivo');
             return;
         }
 

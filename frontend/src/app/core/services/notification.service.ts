@@ -16,7 +16,7 @@ export interface Notification {
     providedIn: 'root'
 })
 export class NotificationService {
-    private http = inject(HttpClient);
+    private http: HttpClient = inject(HttpClient);
     private baseUrl = '/api/v1';
 
     getNotifications(): Observable<Notification[]> {

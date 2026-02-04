@@ -1,3 +1,4 @@
+
 import { Component, inject, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -5,10 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationService } from '../../../core/services/notification.service';
-import { LucideAngularModule, Search, Filter, ArrowUpDown, MapPin, ChevronRight, Signal } from 'lucide-angular';
+import { LucideAngularModule, Search, Filter, ArrowUpDown, MapPin, ChevronRight, Signal, Sparkles } from 'lucide-angular';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { firstValueFrom } from 'rxjs';
+import { AiAssistantService } from '../../../core/services/ai-assistant.service';
 
 interface Radio {
   id: number;
@@ -44,7 +46,6 @@ export class RadioPanelComponent implements OnInit {
   private _equipos: any[] = [];
 
   @Input() set equipos(value: any[]) {
-    console.log('📦 app-radio-panel: Input equipos received', value?.length);
     this._equipos = value || [];
     this.rawEquipos = [...this._equipos];
     if (this._equipos.length > 0) {
@@ -74,19 +75,21 @@ export class RadioPanelComponent implements OnInit {
   readonly ArrowUpDown = ArrowUpDown;
   readonly ChevronRight = ChevronRight;
   readonly Signal = Signal;
+  readonly Sparkles = Sparkles;
 
   showConfirmModal = false;
   pendingRadio: Radio | null = null;
   confirmModalTitle = 'Confirmar Cambio de Equipo';
   confirmModalMessage = '¿Está seguro que desea cambiar el equipo que se encuentra AL AIRE?';
 
-  private http = inject(HttpClient);
-  private cdr = inject(ChangeDetectorRef);
-  private authService = inject(AuthService);
-  private toastService = inject(ToastService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private notificationService = inject(NotificationService);
+  private http: HttpClient = inject(HttpClient);
+  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private authService: AuthService = inject(AuthService);
+  private toastService: ToastService = inject(ToastService);
+  private router: Router = inject(Router);
+  private route: ActivatedRoute = inject(ActivatedRoute);
+  private notificationService: NotificationService = inject(NotificationService);
+  private aiService: AiAssistantService = inject(AiAssistantService);
 
   ESTADO_LABELS: any = {
     'OK': 'OPERATIVO',
@@ -148,7 +151,6 @@ export class RadioPanelComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Solo cargamos si no se nos pasaron los equipos por Input para evitar duplicar pedidos
     if (!this._equipos || this._equipos.length === 0) {
       this.loadRadios();
     }
@@ -173,100 +175,43 @@ export class RadioPanelComponent implements OnInit {
     const grouped = new Map<string, Radio>();
 
     rawRadios.forEach(r => {
-      // Normalizar nombre de aeropuerto para agrupar
       r.cleanAirport = (r.vhf?.aeropuerto || 'SIN_AEROPUERTO').trim().toUpperCase();
-
-      // Determine Role (Main vs Standby)
-      // Hierarchy: 
-      // 1. Explicit 'tipoEquipo' (if contains Match)
-      // 2. Explicit 'tipo' in Canal (if available in future, currently not fetched in all endpoints but good to be safe)
-      // 3. String match in Model/Sitio
-
       const rawType = (r.tipoEquipo || '').toUpperCase();
       let isStandby = rawType.includes('STANDBY') || rawType.includes('STBY') || rawType.includes('DUPE') || rawType === 'SBY';
 
       if (!isStandby) {
-        // Fallback checks
         isStandby = (r.marca + r.modelo + r.numeroSerie).toLowerCase().includes('standby') ||
           (r.vhf?.sitio || '').toLowerCase().includes('standby') ||
           (r.vhf?.sitio || '').toLowerCase().includes('stby');
       }
 
-      // Generar Clave de Agrupación
       let key = '';
-
       if (r.frecuencia && r.frecuencia > 0) {
-        // Opción 1: Agrupar por Frecuencia exacta + Aeropuerto
         key = `${r.frecuencia.toFixed(3)}_${r.cleanAirport}`;
-
-        // Fix for multiple pairs on same freq/airport (e.g. multiple TWR positions)?
-        // If we have unique positions (TWR 1, TWR 2) they ideally need distinct freqs or sites.
-        // For now, assume frequency unifies the pair.
       } else {
-        // Opción 2: Fallback para equipos sin frecuencia
-        const modelBase = (r.modelo || 'GENERIC')
-          .replace(/standby/gi, '')
-          .replace(/stby/gi, '')
-          .trim()
-          .toUpperCase();
-
-        const marcaBase = (r.marca || '')
-          .replace(/standby/gi, '')
-          .replace(/stby/gi, '')
-          .trim()
-          .toUpperCase();
-
-        // Include Sitio in key to separate different sites in same airport
+        const modelBase = (r.modelo || 'GENERIC').replace(/standby/gi, '').replace(/stby/gi, '').trim().toUpperCase();
         const sitio = (r.vhf?.sitio || 'SITIO').trim().toUpperCase().replace(/STANDBY/g, '').replace(/STBY/g, '').trim();
-
         key = `NO_FREQ_${r.cleanAirport}_${sitio}_${modelBase}`;
       }
 
       if (grouped.has(key)) {
         const existing = grouped.get(key)!;
-
-        // Lógica de fusión
         if (isStandby) {
-          // If already have standby, we might have a conflict or a second standby (Dupe)
-          // Just overwrite or keep based on logical priority? 
-          // Current req: Eq2 is Standby/Dupe.
           if (!existing.hasStandby) {
             existing.standby = r;
             existing.hasStandby = true;
-          } else {
-            // We have >1 standby. Ignore or maybe stick to the first found?
-            // Let's keep first found for stability.
           }
         } else {
-          // It is MAIN
           if (!existing.hasMain) {
             existing.main = r;
             existing.hasMain = true;
-
-            // Si no hay una preferencia guardada, y acabamos de encontrar el MAIN,
-            // asegurémonos de que la vista cambie al MAIN por defecto.
             const savedSide = localStorage.getItem(`activeSide_${key}`);
             if (!savedSide) {
               existing.activeSide = 'MAIN';
             }
-          } else {
-            // Already have Main. Is this a duplicate Main?
-            // If we don't have standby yet, and this "Main" looks suspicious, maybe it is the standby?
-            // But trusting the "Main" flag is safer.
-            // If we have duplicate Mains, we effectively ignore the second one in this pair logic.
-            // OR maybe it belongs to a new pair (different Key?) -> but Key is freq based.
-            // Let's assume strict pairing.
-
-            // Fallback: If no standby exists, force this into standby slot? 
-            // ONLY if strictly requested, but "Eq1 always Main" implies we shouldn't put Main in Standby slot.
-            // User said "Eq2 is Standby OR Dupe".
-            // So if we have a duplicate Main (Dupe), maybe it goes to Eq2?
-            if (!existing.hasStandby) {
-              existing.standby = r;
-              existing.hasStandby = true;
-              // Update local visual state for the new standby part
-              // existing.standby.tipoEquipo might say 'Main', but it is acting as 'Dupe'.
-            }
+          } else if (!existing.hasStandby) {
+            existing.standby = r;
+            existing.hasStandby = true;
           }
         }
         this.syncRadioVisualState(existing);
@@ -275,13 +220,10 @@ export class RadioPanelComponent implements OnInit {
           id: r.id,
           frequency: r.frecuencia,
           name: r.vhf?.sitio || r.vhf?.aeropuerto || 'SITIO',
-          activeSide: 'MAIN', // Default to Main view
-          onAirSide: isStandby ? 'STANDBY' : 'MAIN', // If we only found Standby so far, it is the one on air? No, usually Main.
-          // Actually onAirSide tracks which physical transmitter is radiating. We don't know from DB state necessarily.
-          // Default to Main.
-
+          activeSide: 'MAIN',
+          onAirSide: isStandby ? 'STANDBY' : 'MAIN',
           estado: r.estado || 'OK',
-          status: 'EQUIPO 1', // Label for current view
+          status: 'EQUIPO 1',
           model: r.modelo,
           tipoEquipo: r.tipoEquipo,
           aeropuerto: r.vhf,
@@ -291,57 +233,37 @@ export class RadioPanelComponent implements OnInit {
           standby: isStandby ? r : undefined
         };
 
-        // Forzar modelo limpio en la visualización
         if (radio.model) {
           radio.model = radio.model.replace(/\s*standby\s*/yi, '').trim();
         }
 
-        // Recuperar preferencia guardada
         const savedSide = localStorage.getItem(`activeSide_${key}`);
         const savedOnAir = localStorage.getItem(`onAirSide_${key}`);
 
         if (savedSide === 'MAIN' || savedSide === 'STANDBY') {
           radio.activeSide = savedSide;
         } else {
-          // LÓGICA DE PRIORIDAD: Si tenemos Main, siempre mostrar MAIN por defecto
-          // Si SOLO tenemos Standby, mostrar Standby.
-          if (radio.hasMain) {
-            radio.activeSide = 'MAIN';
-          } else if (radio.hasStandby) {
-            radio.activeSide = 'STANDBY';
-          }
+          radio.activeSide = radio.hasMain ? 'MAIN' : 'STANDBY';
         }
 
-        if (savedOnAir === 'MAIN' || savedOnAir === 'STANDBY') {
-          radio.onAirSide = savedOnAir;
-        } else {
-          // Por defecto, asumimos que el equipo 1 está al aire
-          radio.onAirSide = 'MAIN';
-        }
+        radio.onAirSide = (savedOnAir === 'MAIN' || savedOnAir === 'STANDBY') ? savedOnAir : 'MAIN';
 
         this.syncRadioVisualState(radio);
         grouped.set(key, radio);
       }
     });
 
-    // Check for checklist notifications
     this.checkAndNotifyMaintenance();
-
     this.radios = Array.from(grouped.values());
   }
 
   private checkAndNotifyMaintenance() {
     this.radios.forEach(radio => {
       if (radio.checklistWarning && radio.daysSinceChecklist) {
-        // Solo notificar si es exactamente un hito (ej: 30 días o 45 días) o una vez al día
-        // Aquí usamos una notificación simple a través del servicio persistente
         this.notificationService.create(
           `Mantenimiento Preventivo: El equipo ${radio.model} en ${radio.name} requiere checklist (${radio.daysSinceChecklist} días sin inspección).`,
           'WARNING',
-          {
-            aeropuertoId: radio.aeropuerto?.aeropuertoId,
-            firId: radio.aeropuerto?.firId
-          }
+          { aeropuertoId: radio.aeropuerto?.aeropuertoId, firId: radio.aeropuerto?.firId }
         ).subscribe();
       }
     });
@@ -356,42 +278,29 @@ export class RadioPanelComponent implements OnInit {
     return 0;
   }
 
-  // Method to manually switch sides via tabs
   setSide(radio: Radio, side: 'MAIN' | 'STANDBY') {
     radio.activeSide = side;
-
-    // Save preference
-    // Careful: key generation must be consistent.
     if (radio.frequency && radio.frequency > 0) {
       const key = `${radio.frequency.toFixed(3)}_${(radio.aeropuerto?.aeropuerto || 'SIN_APT').trim().toUpperCase()}`;
       localStorage.setItem(`activeSide_${key}`, side);
     }
-
     this.syncRadioVisualState(radio);
   }
 
   syncRadioVisualState(radio: Radio) {
     const mainData = radio.main;
     const standbyData = radio.standby;
-
-    // Strict Mapping:
-    // If activeSide is MAIN, show mainData (Eq 1)
-    // If activeSide is STANDBY, show standbyData (Eq 2)
-
     const displaySide = radio.activeSide;
     const targetData = displaySide === 'MAIN' ? mainData : standbyData;
 
-    // Determine what to show
     if (targetData) {
       radio.id = targetData.id;
       radio.estado = targetData.estado;
       radio.status = displaySide === 'MAIN' ? 'EQUIPO 1' : 'EQUIPO 2';
-
       const rawModel = `${targetData.marca} ${targetData.modelo}`;
       radio.model = rawModel.replace(/\s*standby\s*/yi, '').replace(/\s*stby\s*/yi, '').trim();
-      radio.tipoEquipo = targetData.tipoEquipo; // e.g. "Main", "Standby"
+      radio.tipoEquipo = targetData.tipoEquipo;
 
-      // Checklist Notification Logic
       const alert = this.getChecklistAlert(targetData.lastChecklistDate);
       if (alert) {
         radio.checklistWarning = alert.message;
@@ -401,32 +310,20 @@ export class RadioPanelComponent implements OnInit {
         radio.daysSinceChecklist = undefined;
       }
     } else {
-      // Target side is empty (e.g. clicked Eq 2 but no standby)
-      radio.id = -1; // Flag for empty
-      radio.estado = 'APAGADO'; // Or specific state
+      radio.id = -1;
+      radio.estado = 'APAGADO';
       radio.status = displaySide === 'MAIN' ? 'EQUIPO 1 (VACÍO)' : 'EQUIPO 2 (VACÍO)';
       radio.model = 'Sin Equipo';
-      radio.tipoEquipo = '';
     }
 
-    // Secondary Banner Logic
-    // Show status of the OTHER side
     const secondaryData = displaySide === 'MAIN' ? standbyData : mainData;
-
     if (secondaryData && (radio.estado !== secondaryData.estado || radio.estado !== 'OK')) {
       const sScore = this.getStatusScore(secondaryData.estado);
-      const type = sScore >= 3 ? 'OP' : (sScore === 2 ? 'NOV' : 'F.S'); // 3 is OK
+      const type = sScore >= 3 ? 'OP' : (sScore === 2 ? 'NOV' : 'F.S');
       const secondaryDisplay = displaySide === 'MAIN' ? 'EQ 2' : 'EQ 1';
-
       radio.secondaryStatusLabel = `${secondaryDisplay} - ${type}`;
-
-      if (sScore >= 3) { // OK
-        radio.secondaryStatusClass = 'bg-emerald-500 text-black border-emerald-600/30';
-      } else if (sScore === 2) {
-        radio.secondaryStatusClass = 'bg-amber-400 text-black border-amber-600/30';
-      } else {
-        radio.secondaryStatusClass = 'bg-red-500 text-black border-red-700/30';
-      }
+      radio.secondaryStatusClass = sScore >= 3 ? 'bg-emerald-500 text-black border-emerald-600/30' :
+        (sScore === 2 ? 'bg-amber-400 text-black border-amber-600/30' : 'bg-red-500 text-black border-red-700/30');
     } else {
       radio.secondaryStatusLabel = undefined;
       radio.secondaryStatusClass = undefined;
@@ -437,24 +334,18 @@ export class RadioPanelComponent implements OnInit {
     return this.radios.filter(radio => {
       const matchesSearch = radio.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         radio.frequency.toString().includes(this.searchTerm);
-
       const matchesAirport = this.airportFilter === 'ALL' || radio.aeropuerto?.aeropuerto === this.airportFilter;
       const matchesStatus = this.statusFilter === 'ALL' || radio.estado === this.statusFilter;
-
       return matchesSearch && matchesAirport && matchesStatus;
     }).sort((a, b) => {
       if (this.sortBy === 'FREQ') return a.frequency - b.frequency;
       if (this.sortBy === 'NAME') return a.name.localeCompare(b.name);
-      return 0; // STATUS sorting logic can be more complex
+      return 0;
     });
   }
 
   setSort(sort: string) {
     this.sortBy = sort as any;
-  }
-
-  toggleMainStandby(event: Event, radio: Radio) {
-    this.handleToggleRequest(event, radio);
   }
 
   handleToggleRequest(event: Event, radio: Radio) {
@@ -463,10 +354,8 @@ export class RadioPanelComponent implements OnInit {
       const currentSide = radio.onAirSide || 'MAIN';
       const targetSide = currentSide === 'MAIN' ? 'STANDBY' : 'MAIN';
       const targetData = targetSide === 'MAIN' ? radio.main : radio.standby;
-      const currentData = currentSide === 'MAIN' ? radio.main : radio.standby;
-
-      // Rule: Block if target is not OPERATIVO (OK)
       const targetStatus = targetData?.estado?.toUpperCase() || 'OK';
+
       if (['NOVEDAD', 'FUERA_SERVICIO', 'FALLA', 'PRECAUCION'].includes(targetStatus)) {
         const targetLabel = targetSide === 'MAIN' ? 'Equipo 1' : 'Equipo 2';
         this.toastService.warning(`No se puede conmutar: El ${targetLabel} tiene una novedad activa.`);
@@ -484,28 +373,21 @@ export class RadioPanelComponent implements OnInit {
   confirmToggle() {
     if (this.pendingRadio) {
       const radio = this.pendingRadio;
-      // Toggle onAirSide relative to its current state
       radio.onAirSide = (radio.onAirSide || 'MAIN') === 'MAIN' ? 'STANDBY' : 'MAIN';
-
-      // Optionally sync the view to the new on-air equipment
       radio.activeSide = radio.onAirSide;
-
       this.syncRadioVisualState(radio);
 
-      // Guardar preferencia en localStorage para persistencia del AL AIRE y el VISTA
       const key = `${radio.frequency?.toFixed(3)}_${radio.aeropuerto?.aeropuerto?.trim().toUpperCase()}`;
       localStorage.setItem(`onAirSide_${key}`, radio.onAirSide);
       localStorage.setItem(`activeSide_${key}`, radio.activeSide);
 
       const targetName = radio.onAirSide === 'MAIN' ? 'Equipo 1' : 'Equipo 2';
       this.toastService.success(`Se ha cambiado al ${targetName}`);
-      // Crear notificación persistente
       this.notificationService.create(
-        `Cambio de equipo en ${radio.aeropuerto?.aeropuerto || radio.name || 'Sitio Desconocido'}: se puso AL AIRE el ${targetName}`,
+        `Cambio de equipo en ${radio.aeropuerto?.aeropuerto || radio.name || 'Sitio'}: AL AIRE el ${targetName}`,
         'INFO',
         { aeropuertoId: radio.aeropuerto?.aeropuertoId, firId: radio.aeropuerto?.firId }
       ).subscribe();
-
       this.closeConfirmModal();
     }
   }
@@ -516,11 +398,8 @@ export class RadioPanelComponent implements OnInit {
   }
 
   navigateToChecklist(radioId: number) {
-    this.equipmentClick.emit(radioId);
-
     const radio = this.radios.find(r => r.id === radioId);
     if (!radio) return;
-
     const user = this.authService.userValue;
     const activeData = radio.activeSide === 'MAIN' ? radio.main : radio.standby;
 
@@ -531,13 +410,19 @@ export class RadioPanelComponent implements OnInit {
       equipoId: activeData.id,
       aeropuertoId: user?.context?.aeropuertoId
     }).subscribe({
-      next: (checklist) => {
+      next: (checklist: any) => {
         this.router.navigate([`/checklists/${checklist.id}/mimic`]);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error creating checklist:', err);
         this.toastService.error('Error al iniciar checklist');
       }
     });
+  }
+
+  askAI(radio: Radio) {
+    const activeData = radio.activeSide === 'MAIN' ? radio.main : radio.standby;
+    const prompt = `Hola EANA AI. Tengo un equipo ${activeData.marca} ${activeData.modelo} con frecuencia ${radio.frequency} MHz en ${radio.name}. Su estado actual es ${radio.estado}. ¿Qué procedimientos de mantenimiento o fallas comunes debería revisar si presentara inestabilidad en la portadora?`;
+    this.aiService.openWithPrompt(prompt);
   }
 }

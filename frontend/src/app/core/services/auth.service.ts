@@ -1,7 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, tap } from 'rxjs';
+import { tap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 export interface User {
     token: string;
@@ -22,10 +23,14 @@ export class AuthService {
     private http = inject(HttpClient);
     private router = inject(Router);
 
-    private userSubject = new BehaviorSubject<User | null>(this.getInitialUser());
-    user$ = this.userSubject.asObservable();
+    private userSignal = signal<User | null>(this.getInitialUser());
+    user = this.userSignal.asReadonly();
+    user$ = toObservable(this.userSignal);
+    isAuthenticated = computed(() => !!this.userSignal());
 
-    loading$ = new BehaviorSubject<boolean>(false);
+    private isLoadingSignal = signal<boolean>(false);
+    loading = this.isLoadingSignal.asReadonly();
+    loading$ = toObservable(this.isLoadingSignal);
 
     constructor() { }
 
@@ -52,11 +57,11 @@ export class AuthService {
     }
 
     get userValue() {
-        return this.userSubject.value;
+        return this.userSignal();
     }
 
     login(email: string, password: string) {
-        this.loading$.next(true);
+        this.isLoadingSignal.set(true);
         return this.http.post<any>('/api/v1/auth/login', { email, password }).pipe(
             tap({
                 next: (data) => {
@@ -78,14 +83,14 @@ export class AuthService {
                         id: userData.id,
                         context: userData.context
                     };
-                    this.userSubject.next(user);
+                    this.userSignal.set(user);
                     this.router.navigate(['/dashboard']);
                 },
                 error: (err) => {
                     console.error('Login failed', err);
-                    this.loading$.next(false);
+                    this.isLoadingSignal.set(false);
                 },
-                complete: () => this.loading$.next(false)
+                complete: () => this.isLoadingSignal.set(false)
             })
         );
     }
@@ -96,7 +101,7 @@ export class AuthService {
         localStorage.removeItem('email');
         localStorage.removeItem('userId');
         localStorage.removeItem('context');
-        this.userSubject.next(null);
+        this.userSignal.set(null);
         this.router.navigate(['/login']);
     }
 

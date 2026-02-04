@@ -142,12 +142,20 @@
                                 <span>Conmutar</span>
                             </button>
 
-                            <button (click)="navigateToChecklist(radio.id)"
-                                class="flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 text-white text-[10px] font-black rounded-xl transition-all active:scale-95 border border-slate-600 group/btn shadow-lg uppercase tracking-wider">
-                                <span>Detalles</span>
-                                <lucide-icon [name]="ChevronRight" [size]="14"
-                                    class="group-hover/btn:translate-x-1 transition-transform"></lucide-icon>
-                            </button>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button (click)="askAI(radio)"
+                                    class="flex items-center justify-center bg-slate-900 hover:bg-blue-900/40 text-blue-400 p-2 text-[10px] font-black rounded-xl transition-all border border-blue-500/30 group/ai shadow-lg uppercase tracking-wider"
+                                    title="Consultar a EANA AI">
+                                    <lucide-icon [name]="Sparkles" [size]="14"
+                                        class="group-hover/ai:animate-pulse"></lucide-icon>
+                                </button>
+
+                                <button (click)="navigateToChecklist(radio.id)"
+                                    class="flex items-center justify-center gap-2 bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 text-white p-2 text-[10px] font-black rounded-xl transition-all active:scale-95 border border-slate-600 group/btn shadow-lg uppercase tracking-wider">
+                                    <lucide-icon [name]="ChevronRight" [size]="14"
+                                        class="group-hover/btn:translate-x-1 transition-transform"></lucide-icon>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

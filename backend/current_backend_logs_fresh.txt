@@ -1,0 +1,352 @@
+
+> eana-backend-nest@0.0.1 start:dev
+> nest start --watch
+
+[2J[3J[H[[90m03:05:42[0m] Starting compilation in watch mode...
+
+[[90m03:06:02[0m] Found 0 errors. Watching for file changes.
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+DEBUG ENV: { HOST: 'localhost', PORT: '5434', DB: 'cns_db' }
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +112ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCommonModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMulterModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mThrottlerModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mServeStaticModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:14 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUploadModule dependencies initialized[39m[38;5;3m +14ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:16 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMailModule dependencies initialized[39m[38;5;3m +1795ms[39m
+[32m[Nest] 21576  - [39m28/01/2026, 03:06:16 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +94ms[39m
+[Nest] 21576  - 28/01/2026, 03:06:16   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (1)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:19   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (2)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:22   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (3)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:25   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (4)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:28   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (5)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:31   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (6)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:34   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (7)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:37   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (8)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:40   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (9)...
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[Nest] 21576  - 28/01/2026, 03:06:40   ERROR [ExceptionHandler] 
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[2J[3J[H[[90m03:57:34[0m] File change detected. Starting incremental compilation...
+
+[[90m03:57:37[0m] Found 0 errors. Watching for file changes.
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ­ƒöä add secrets lifecycle management: https://dotenvx.com/ops
+DEBUG ENV: { HOST: 'localhost', PORT: '5432', DB: 'cns_db' }
+[2J[3J[H[[90m03:57:40[0m] File change detected. Starting incremental compilation...
+
+[[90m03:57:43[0m] Found 0 errors. Watching for file changes.
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ­ƒæÑ sync secrets across teammates & machines: https://dotenvx.com/ops
+DEBUG ENV: { HOST: 'localhost', PORT: '5432', DB: 'cns_db' }
+[2J[3J[H[[90m03:57:44[0m] File change detected. Starting incremental compilation...
+
+[[90m03:57:45[0m] Found 0 errors. Watching for file changes.
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ÔÜÖ´©Å  enable debug logging with { debug: true }
+DEBUG ENV: { HOST: 'localhost', PORT: '5432', DB: 'cns_db' }
+[2J[3J[H[[90m03:57:47[0m] File change detected. Starting incremental compilation...
+
+[[90m03:57:49[0m] Found 0 errors. Watching for file changes.
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ­ƒöä add secrets lifecycle management: https://dotenvx.com/ops
+DEBUG ENV: { HOST: 'localhost', PORT: '5432', DB: 'cns_db' }
+[2J[3J[H[[90m03:57:53[0m] File change detected. Starting incremental compilation...
+
+[[90m03:57:57[0m] Found 0 errors. Watching for file changes.
+
+[2J[3J[H[[90m03:57:58[0m] File change detected. Starting incremental compilation...
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+DEBUG ENV: { HOST: 'localhost', PORT: '5432', DB: 'cns_db' }
+[[90m03:57:59[0m] Found 0 errors. Watching for file changes.
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+DEBUG ENV: { HOST: 'localhost', PORT: '5432', DB: 'cns_db' }
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +180ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCommonModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMulterModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mThrottlerModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mServeStaticModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUploadModule dependencies initialized[39m[38;5;3m +21ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMailModule dependencies initialized[39m[38;5;3m +166ms[39m
+[32m[Nest] 18944  - [39m28/01/2026, 03:58:11 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +34ms[39m
+[Nest] 18944  - 28/01/2026, 03:58:13   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (1)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:16   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (2)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:19   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (3)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:23   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (4)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:26   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (5)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:29   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (6)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:32   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (7)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:35   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (8)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:39   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (9)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 18944  - 28/01/2026, 03:58:39   ERROR [ExceptionHandler] la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[2J[3J[H[[90m04:31:57[0m] File change detected. Starting incremental compilation...
+
+[[90m04:32:04[0m] Found 0 errors. Watching for file changes.
+
+[dotenv@17.2.3] injecting env (14) from .env -- tip: ­ƒöä add secrets lifecycle management: https://dotenvx.com/ops
+DEBUG ENV: { HOST: 'localhost', PORT: '5432', DB: 'cns_db' }
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[33m[Nest] 31204  - [39m28/01/2026, 04:32:15 [33m   WARN[39m [38;5;3m[ModuleTokenFactory] [39m[33mThe module "TypeOrmModule" is taking 11.86ms to serialize, this may be caused by larger objects statically assigned to the module. More details: https://github.com/nestjs/nest/issues/12738[39m[38;5;3m +39ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +94ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCommonModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMulterModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mThrottlerModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mServeStaticModule dependencies initialized[39m[38;5;3m +8ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUploadModule dependencies initialized[39m[38;5;3m +25ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMailModule dependencies initialized[39m[38;5;3m +120ms[39m
+[32m[Nest] 31204  - [39m28/01/2026, 04:32:15 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +16ms[39m
+[Nest] 31204  - 28/01/2026, 04:32:16   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (1)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:19   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (2)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:22   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (3)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:25   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (4)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:28   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (5)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:31   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (6)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:34   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (7)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:38   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (8)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:41   ERROR [TypeOrmModule] Unable to connect to the database. Retrying (9)...
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+[Nest] 31204  - 28/01/2026, 04:32:41   ERROR [ExceptionHandler] la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+error: la autentificaci´┐¢n password fall´┐¢ para el usuario ´┐¢postgres´┐¢
+    at parseErrorMessage (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:394:9)
+    at Parser.handlePacket (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:212:19)
+    at Parser.parse (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\parser.ts:105:30)
+    at Socket.<anonymous> (C:\Users\exe20\OneDrive\Escritorio\proyecto-Eana\erp-eana\backend\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)

@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DashboardService } from './dashboard.service';
@@ -7,9 +8,11 @@ import { Navegacion } from '../navegacion/entities/navegacion.entity';
 import { Vigilancia } from '../vigilancia/entities/vigilancia.entity';
 import { Energia } from '../energia/entities/energia.entity';
 import { Personal } from '../personal/entities/personal.entity';
+import { Vhf } from '../vhf/entities/vhf.entity';
+import { Vor } from '../vor/entities/vor.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Equipo, Navegacion, Vigilancia, Energia, Personal])],
+    imports: [TypeOrmModule.forFeature([Equipo, Navegacion, Vigilancia, Energia, Personal, Vhf, Vor])],
     controllers: [DashboardController],
     providers: [DashboardService],
 })

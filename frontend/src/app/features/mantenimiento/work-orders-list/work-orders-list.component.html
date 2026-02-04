@@ -19,6 +19,12 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-6">
+                <button (click)="openCreateModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-2xl flex items-center gap-3 transition-all shadow-lg shadow-blue-500/20 active:scale-95 group">
+                    <lucide-icon [name]="Plus" [size]="20"
+                        class="group-hover:rotate-90 transition-transform duration-300"></lucide-icon>
+                    NUEVA OT
+                </button>
                 <div class="glass-card px-6 py-4 rounded-3xl border border-white/5 flex flex-col items-center">
                     <span class="text-2xl font-black text-white">{{ orders.length }}</span>
                     <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Total OTs</span>
@@ -32,7 +38,87 @@
         </div>
     </div>
 
+    <!-- Create OT Modal -->
+    <div *ngIf="showCreateModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-300">
+        <div
+            class="glass-card w-full max-w-xl rounded-[2.5rem] p-10 border border-white/10 shadow-3xl animate-in zoom-in-95 duration-300 relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px]"></div>
+
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-10">
+                    <h2 class="text-3xl font-black text-white tracking-tight flex items-center gap-4">
+                        <div class="w-1.5 h-10 bg-blue-500 rounded-full"></div>
+                        Crear Nueva OT
+                    </h2>
+                    <button (click)="closeCreateModal()"
+                        class="p-3 hover:bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all">
+                        <lucide-icon [name]="X" [size]="24"></lucide-icon>
+                    </button>
+                </div>
+
+                <form (submit)="saveOrder()" class="space-y-8">
+                    <!-- Equipo Select -->
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Seleccionar
+                            Equipo</label>
+                        <select [(ngModel)]="newOrder.equipoId" name="equipoId" required
+                            class="w-full bg-slate-900/60 border border-white/5 rounded-2xl py-4 px-6 text-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-600/30 focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+                            <option [ngValue]="null">--- Seleccione Equipo ---</option>
+                            <option *ngFor="let eq of equipments" [ngValue]="eq.id">
+                                {{ eq.marca }} {{ eq.modelo }} ({{ eq.tipoEquipo }}) - {{ eq.vhf?.aeropuerto ||
+                                eq.vhf?.sitio }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Descripción
+                            de la Falla / Tarea</label>
+                        <textarea [(ngModel)]="newOrder.descripcion" name="descripcion" rows="4" required
+                            placeholder="Describa brevemente el motivo de la orden de trabajo..."
+                            class="w-full bg-slate-900/60 border border-white/5 rounded-3xl py-4 px-6 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/30 focus:border-blue-500/50 transition-all placeholder-slate-600 resize-none"></textarea>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Prioridad
+                            Operativa</label>
+                        <div class="grid grid-cols-3 gap-4">
+                            <button type="button" (click)="newOrder.prioridad = 'BAJA'"
+                                [class.bg-blue-500]="newOrder.prioridad === 'BAJA'"
+                                [class.text-white]="newOrder.prioridad === 'BAJA'"
+                                class="py-4 rounded-2xl border border-white/5 bg-white/5 text-slate-400 font-black text-[10px] uppercase tracking-widest transition-all">BAJA</button>
+                            <button type="button" (click)="newOrder.prioridad = 'MEDIA'"
+                                [class.bg-amber-500]="newOrder.prioridad === 'MEDIA'"
+                                [class.text-white]="newOrder.prioridad === 'MEDIA'"
+                                class="py-4 rounded-2xl border border-white/5 bg-white/5 text-slate-400 font-black text-[10px] uppercase tracking-widest transition-all">MEDIA</button>
+                            <button type="button" (click)="newOrder.prioridad = 'ALTA'"
+                                [class.bg-red-500]="newOrder.prioridad === 'ALTA'"
+                                [class.text-white]="newOrder.prioridad === 'ALTA'"
+                                class="py-4 rounded-2xl border border-white/5 bg-white/5 text-slate-400 font-black text-[10px] uppercase tracking-widest transition-all">ALTA</button>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="pt-6 flex gap-4">
+                        <button type="button" (click)="closeCreateModal()"
+                            class="flex-1 py-4 px-8 rounded-2xl bg-white/5 text-slate-400 font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all">
+                            Cancelar
+                        </button>
+                        <button type="submit" [disabled]="isSaving || !newOrder.equipoId || !newOrder.descripcion"
+                            class="flex-[2] py-4 px-8 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                            {{ isSaving ? 'Creando...' : 'Generar Orden de Trabajo' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Filters -->
+
     <div class="flex flex-col lg:flex-row gap-6 mb-10 animate-slide-up" style="animation-delay: 0.1s">
         <div class="relative flex-1 group">
             <div

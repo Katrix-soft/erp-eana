@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 import { VigilanciaService, Vigilancia } from '../../../core/services/vigilancia.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { take } from 'rxjs';
-import { LucideAngularModule, Radar, MapPin, Activity, Shield, AlertTriangle, CheckCircle, RefreshCw, History } from 'lucide-angular';
+import { LucideAngularModule, Radar, MapPin, Activity, Shield, AlertTriangle, CheckCircle, RefreshCw, History, Sparkles, X } from 'lucide-angular';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
+import { AiAssistantService } from '../../../core/services/ai-assistant.service';
 
 @Component({
   selector: 'app-vigilancia-list',
@@ -119,14 +120,18 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
             <!-- Action Buttons -->
             <div class="flex gap-2 pt-2">
               <button (click)="conmutarCanales(eq)" 
-                      class="flex-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 border border-sky-500/20 group/btn">
-                <lucide-icon [name]="RefreshCw" [size]="14" class="group-hover/btn:rotate-180 transition-transform duration-500"></lucide-icon>
-                Conmutar Canales
+                      class="flex-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-[10px] font-bold py-2 px-2 rounded-xl flex items-center justify-center gap-1 transition-all duration-300 border border-sky-500/20 group/btn">
+                <lucide-icon [name]="RefreshCw" [size]="12" class="group-hover/btn:rotate-180 transition-transform duration-500"></lucide-icon>
+                Canales
               </button>
               <button (click)="verDetalles(eq)"
-                      class="flex-1 bg-slate-800/50 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 border border-white/5 hover:border-white/10 group/btn">
-                <lucide-icon [name]="History" [size]="14" class="group-hover/btn:scale-110 transition-transform"></lucide-icon>
+                      class="flex-1 bg-slate-800/50 hover:bg-slate-700 text-slate-300 text-[10px] font-bold py-2 px-2 rounded-xl flex items-center justify-center gap-1 transition-all duration-300 border border-white/5 hover:border-white/10 group/btn">
+                <lucide-icon [name]="History" [size]="12" class="group-hover/btn:scale-110 transition-transform"></lucide-icon>
                 Historial
+              </button>
+              <button (click)="reportarFalla(eq)"
+                      class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white p-2.5 rounded-xl transition-all duration-300 border border-red-500/20 group/ai shadow-lg shadow-red-500/5">
+                <lucide-icon [name]="Sparkles" [size]="14" class="group-hover/ai:animate-pulse"></lucide-icon>
               </button>
             </div>
           </div>
@@ -139,6 +144,92 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
           <lucide-icon [name]="Radar" [size]="64" class="text-slate-700 opacity-20"></lucide-icon>
         </div>
         <p class="text-xl font-medium text-slate-500">No se encontraron equipos de vigilancia en su región.</p>
+      </div>
+
+      <!-- Detalles Modal -->
+      <div *ngIf="showDetailsModal && selectedEquipamiento" 
+           class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-300">
+        <div class="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] border border-white/10 shadow-3xl overflow-hidden animate-in zoom-in-95 duration-300">
+          <!-- Modal Header -->
+          <div class="relative p-8 pb-0">
+            <div [ngClass]="getStatusClass(selectedEquipamiento.estado)" class="absolute top-0 left-0 w-full h-1.5"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-sky-400 px-3 py-1 bg-sky-400/10 rounded-full mb-3 inline-block">
+                  Ficha Técnica: {{ selectedEquipamiento.definicion || 'VIGILANCIA' }}
+                </span>
+                <h2 class="text-3xl font-black text-white tracking-tight">{{ selectedEquipamiento.ubicacion }}</h2>
+              </div>
+              <button (click)="showDetailsModal = false" class="p-3 hover:bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all">
+                <lucide-icon [name]="X" [size]="24"></lucide-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="p-8 space-y-8">
+            <div class="grid grid-cols-2 gap-6">
+              <div class="space-y-1">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Estado Operativo</p>
+                <div class="flex items-center gap-2">
+                  <div [ngClass]="getStatusDotClass(selectedEquipamiento.estado)" class="w-2.5 h-2.5 rounded-full shadow-lg border border-white/10"></div>
+                  <p class="text-lg font-bold" [ngClass]="getStatusTextClass(selectedEquipamiento.estado)">{{ selectedEquipamiento.estado }}</p>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">ID Sistema (AP SIG)</p>
+                <p class="text-lg font-bold text-white font-mono">{{ selectedEquipamiento.idApSig || 'N/A' }}</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Modelo Equipo</p>
+                <p class="text-lg font-bold text-slate-200">{{ selectedEquipamiento.modelo || '---' }}</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sistema / Red</p>
+                <p class="text-lg font-bold text-slate-200">{{ selectedEquipamiento.sistema || 'VIGILANCIA' }}</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Región (FIR)</p>
+                <p class="text-lg font-bold text-slate-200">{{ selectedEquipamiento.fir }}</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Siglas Local</p>
+                <p class="text-lg font-bold text-slate-200">{{ selectedEquipamiento.siglasLocal || '---' }}</p>
+              </div>
+            </div>
+
+            <div class="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-4">
+              <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <lucide-icon [name]="History" [size]="14"></lucide-icon>
+                Historial de Mantenimientos
+              </h4>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center text-xs p-3 bg-slate-950/50 rounded-xl border border-white/5">
+                  <span class="text-slate-400">2026-01-15</span>
+                  <span class="font-bold text-emerald-400 italic">MANT. PREVENTIVO OK</span>
+                </div>
+                <div class="flex justify-between items-center text-xs p-3 bg-slate-950/50 rounded-xl border border-white/5">
+                  <span class="text-slate-400">2025-12-10</span>
+                  <span class="font-bold text-amber-400 italic">CAMBIO DE FILTROS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="p-8 bg-black/20 flex gap-4">
+            <button (click)="showDetailsModal = false" class="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all">
+              Cerrar Ficha
+            </button>
+            <button (click)="reportarFalla(selectedEquipamiento)" class="flex-1 py-4 bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-red-500 transition-all shadow-lg shadow-red-600/20 flex items-center justify-center gap-2">
+              <lucide-icon [name]="Sparkles" [size]="16"></lucide-icon>
+              Reportar Falla
+            </button>
+            <button (click)="showDetailsModal = false; conmutarCanales(selectedEquipamiento)" class="flex-1 py-4 bg-sky-500 text-black font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20">
+              Conmutar
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Modals -->
@@ -157,14 +248,16 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VigilanciaListComponent implements OnInit {
-  private vigilanciaService = inject(VigilanciaService);
-  private authService = inject(AuthService);
-  private toastService = inject(ToastService);
-  private cdr = inject(ChangeDetectorRef);
+  private vigilanciaService: VigilanciaService = inject(VigilanciaService);
+  private authService: AuthService = inject(AuthService);
+  private toastService: ToastService = inject(ToastService);
+  private aiService: AiAssistantService = inject(AiAssistantService);
+  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
   equipamientos: Vigilancia[] = [];
   loading = true;
   showConfirmModal = false;
+  showDetailsModal = false;
   selectedEquipamiento: Vigilancia | null = null;
 
   readonly Radar = Radar;
@@ -175,6 +268,8 @@ export class VigilanciaListComponent implements OnInit {
   readonly CheckCircle = CheckCircle;
   readonly RefreshCw = RefreshCw;
   readonly History = History;
+  readonly Sparkles = Sparkles;
+  readonly X = X;
 
   ngOnInit() {
     this.loadData();
@@ -228,8 +323,9 @@ export class VigilanciaListComponent implements OnInit {
   }
 
   verDetalles(eq: Vigilancia) {
-    this.toastService.info(`Cargando historial de mantenimientos para ${eq.ubicacion}...`, 'Historial');
-    // Implementación futura: Navegar a detalles o abrir modal de historial
+    this.selectedEquipamiento = eq;
+    this.showDetailsModal = true;
+    this.cdr.markForCheck();
   }
 
   getOperativosCount() {
@@ -265,5 +361,10 @@ export class VigilanciaListComponent implements OnInit {
       case 'FUERA_SERVICIO': return 'text-red-500';
       default: return 'text-slate-500';
     }
+  }
+
+  reportarFalla(eq: Vigilancia) {
+    const prompt = `Hola EANA AI. Deseo reportar una FALLA técnica en el equipo de VIGILANCIA: ${eq.ubicacion} (${eq.modelo}). Sistema: ${eq.sistema}. Región: ${eq.fir}. ID: ${eq.idApSig}. Por favor, ayúdame a generar una Orden de Trabajo (OT) técnica para este radar describiendo una falla en el procesamiento de blancos o en la etapa de RF, y sugiere los pasos de diagnóstico Senior según normativa CNS.`;
+    this.aiService.openWithPrompt(prompt);
   }
 }

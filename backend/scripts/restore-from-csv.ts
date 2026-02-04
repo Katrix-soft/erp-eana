@@ -73,12 +73,19 @@ async function main() {
 
             let inserted = 0;
             for (const record of records) {
-                // Prepare values: handle empty strings as null, dates, booleans
-                const values = Object.values(record).map(val => {
-                    if (val === '') return null;
+                // Prepare values: handle empty strings as null, dates, booleans, and specifically arrays
+                const values = Object.entries(record).map(([key, val]) => {
+                    if (val === '') {
+                        // Special handling for NOT NULL columns with defaults or array types
+                        if (key === 'imagenes') return '{}';
+                        if (key === 'password_changed') return true;
+                        if (key === 'vistas') return 0;
+                        if (key === 'resuelto') return false;
+                        if (key === 'activa') return true;
+                        return null;
+                    }
                     if (val === 't' || val === 'true') return true;
                     if (val === 'f' || val === 'false') return false;
-                    // Try to parse integers if they look like it, but PG driver handles string-to-int usually fine
                     return val;
                 });
 

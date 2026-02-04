@@ -1,0 +1,182 @@
+# ============================================
+# EANA ERP - Production Docker Compose
+# ============================================
+# Este archivo está optimizado para producción
+# Usar: docker compose -f docker-compose.prod.yml up -d
+
+services:
+  # Redis - Cache con persistencia opcional
+  redis:
+    image: redis:7-alpine
+    container_name: cns_redis_prod
+    restart: always
+    command: >
+      redis-server  --maxmemory 256mb  --maxmemory-policy allkeys-lru  --save 900 1  --save 300 10  --save 60 10000 --appendonly yes --loglevel warning
+    networks:
+      - internal
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 300M
+        reservations:
+          cpus: '0.2'
+          memory: 200M
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: cns_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-cns_db}
+      # Optimizaciones para producción
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=es_AR.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # No exponer puerto en producción si no es necesario
+    # ports:
+    #   - "5434:5432"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    image: cns_backend:latest
+    container_name: cns_backend_prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+
+      # Database
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-cns_db}
+
+      # Redis Cache
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_TTL: 300
+      CACHE_ENABLED: "true"
+
+      # Security
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+
+      # External Services
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+
+      # Mail
+      MAIL_HOST: ${MAIL_HOST:-smtp.office365.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
+      MAIL_DESTINATION: ${MAIL_DESTINATION}
+
+      # Frontend URL
+      FRONTEND_URL: ${FRONTEND_URL}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - npm_network
+    volumes:
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # No exponer puerto directamente en producción
+    # Usar Nginx reverse proxy
+    # ports:
+    #   - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    image: cns_frontend:latest
+    container_name: cns_frontend_prod
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal
+      - npm_network
+    ports:
+      - "80:8080"
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.2'
+          memory: 128M
+
+networks:
+  internal:
+    driver: bridge
+  npm_network:
+    driver: bridge
+    # Si no usas npm_network, comentar 'external: true' y descomentar:
+    # driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  uploads_data:
+    driver: local

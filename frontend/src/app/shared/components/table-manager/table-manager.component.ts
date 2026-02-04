@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Eye, Edit, Trash2, Plus, X, Search } from 'lucide-angular';
 import { ModalComponent } from '../modal/modal.component';
+import { ToastService } from '../../../core/services/toast.service';
 
 export interface TableColumn {
   key: string;
@@ -30,6 +31,7 @@ export interface TableColumn {
 })
 export class TableManagerComponent implements OnInit {
   private http = inject(HttpClient);
+  private toastService = inject(ToastService);
 
   @Input() resource!: string;
   @Input() title!: string;
@@ -117,8 +119,11 @@ export class TableManagerComponent implements OnInit {
   handleDelete(id: number) {
     if (confirm('¿Está seguro de eliminar este elemento?')) {
       this.http.delete(`/api/v1/${this.resource}/${id}`).subscribe({
-        next: () => this.fetchItems(),
-        error: (err) => alert('Error al eliminar')
+        next: () => {
+          this.toastService.success('Elemento eliminado correctamente');
+          this.fetchItems();
+        },
+        error: (err) => this.toastService.error('Error al eliminar')
       });
     }
   }
@@ -149,9 +154,10 @@ export class TableManagerComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.isModalOpen = false;
+        this.toastService.success('Cambios guardados correctamente');
         this.fetchItems();
       },
-      error: (err) => alert('Error al guardar')
+      error: (err) => this.toastService.error('Error al guardar los cambios')
     });
   }
 

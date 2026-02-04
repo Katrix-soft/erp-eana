@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { LucideAngularModule, Search, ChevronDown, MapPin, Eye, CheckCircle, FileText } from 'lucide-angular';
+import { LucideAngularModule, Search, ChevronDown, MapPin, Eye, CheckCircle, FileText, Plus, X } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 import { WorkOrdersService } from '../../../core/services/work-orders.service';
 import { WorkOrder } from '../../../core/models/work-order.model';
@@ -35,17 +36,78 @@ export class WorkOrdersListComponent implements OnInit {
     readonly Eye = Eye;
     readonly CheckCircle = CheckCircle;
     readonly FileText = FileText;
+    readonly Plus = Plus;
+    readonly X = X;
     orders: WorkOrder[] = [];
     filteredOrders: WorkOrder[] = [];
     pendingCount = 0;
     private router = inject(Router);
     private workOrdersService = inject(WorkOrdersService);
+    private http = inject(HttpClient);
+
+    // Form states
+    showCreateModal = false;
+    isSaving = false;
+    equipments: any[] = [];
+    newOrder: {
+        equipoId: number | undefined;
+        descripcion: string;
+        prioridad: string;
+        solicitante: string;
+    } = {
+            equipoId: undefined,
+            descripcion: '',
+            prioridad: 'MEDIA',
+            solicitante: ''
+        };
 
     constructor() { }
 
-
     ngOnInit(): void {
         this.loadOrders();
+        this.loadEquipments();
+    }
+
+    loadEquipments(): void {
+        // Obtenemos los equipos para el select del modal
+        this.http.get<any[]>('/api/v1/vhf-equipos/dropdown').subscribe(data => {
+            this.equipments = data;
+        });
+    }
+
+    openCreateModal(): void {
+        this.showCreateModal = true;
+    }
+
+    closeCreateModal(): void {
+        this.showCreateModal = false;
+        this.resetNewOrder();
+    }
+
+    resetNewOrder(): void {
+        this.newOrder = {
+            equipoId: undefined,
+            descripcion: '',
+            prioridad: 'MEDIA',
+            solicitante: ''
+        };
+    }
+
+    saveOrder(): void {
+        if (!this.newOrder.equipoId || !this.newOrder.descripcion) return;
+
+        this.isSaving = true;
+        this.workOrdersService.create(this.newOrder as any).subscribe({
+            next: () => {
+                this.isSaving = false;
+                this.closeCreateModal();
+                this.loadOrders();
+            },
+            error: (err) => {
+                this.isSaving = false;
+                console.error('Error creating order:', err);
+            }
+        });
     }
 
     loadOrders(): void {
@@ -63,7 +125,7 @@ export class WorkOrdersListComponent implements OnInit {
         this.pendingCount = this.orders.filter(o => ['ABIERTA', 'EN_PROGRESO', 'ESPERANDO_REPUESTO'].includes(o.estado)).length;
     }
 
-    onSearch(event: any): void {
+    onSearch(event: Event): void {
         const query = (event.target as HTMLInputElement).value.toLowerCase();
         this.filteredOrders = this.orders.filter(o =>
             o.numero.toLowerCase().includes(query) ||
@@ -72,7 +134,7 @@ export class WorkOrdersListComponent implements OnInit {
         );
     }
 
-    filterByStatus(event: any): void {
+    filterByStatus(event: Event): void {
         const status = (event.target as HTMLSelectElement).value;
         if (!status) {
             this.filteredOrders = this.orders;

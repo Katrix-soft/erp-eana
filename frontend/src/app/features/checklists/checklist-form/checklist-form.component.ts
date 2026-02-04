@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -25,22 +25,19 @@ export class ChecklistFormComponent implements OnInit {
     private equipmentService = inject(EquipmentService);
 
     form!: FormGroup;
-    loading = false;
-    mode: 'create' | 'edit' | 'view' = 'create';
-    id: string | null = null;
-    showSuccessModal = false;
-    users: any[] = [];
-    localUsers: any[] = [];
-    regionalUsers: any[] = [];
-    user$ = this.authService.user$;
+    loading = signal(false);
+    mode = signal<'create' | 'edit' | 'view'>('create');
+    id = signal<string | null>(null);
+    showSuccessModal = signal(false);
 
-    readonly Save = Save;
-    readonly ArrowLeft = ArrowLeft;
-    readonly Printer = Printer;
-    readonly CheckCircle = CheckCircle;
-    readonly Edit = Edit;
-    readonly ChevronDown = ChevronDown;
-    readonly AlertTriangle = AlertTriangle;
+    users = signal<any[]>([]);
+    localUsers = signal<any[]>([]);
+    regionalUsers = signal<any[]>([]);
+
+    user = this.authService.user;
+    isView = computed(() => this.mode() === 'view');
+
+    readonly icons = { Save, ArrowLeft, Printer, CheckCircle, Edit, ChevronDown, AlertTriangle };
     now = new Date();
 
     mainItems = [
@@ -60,12 +57,14 @@ export class ChecklistFormComponent implements OnInit {
     ngOnInit() {
         this.initForm();
         this.route.paramMap.subscribe(params => {
-            this.id = params.get('id');
-            if (this.id) {
-                this.mode = this.route.snapshot.data['mode'] || 'view';
+            const idParam = params.get('id');
+            this.id.set(idParam);
+
+            if (idParam) {
+                this.mode.set(this.route.snapshot.data['mode'] || 'view');
                 this.loadChecklist();
             } else {
-                this.mode = 'create';
+                this.mode.set('create');
                 this.setDefaults();
             }
         });
@@ -92,11 +91,9 @@ export class ChecklistFormComponent implements OnInit {
             squelch_obs: ['#1: 120db / #2: 120db'],
             puesta_tierra: [''],
             dias_sin_alternancia: ['20424 dias'],
-            // New fields for modern checklist steps
             al_aire: [false],
             estado_operativo: [''],
             sistema_energia: ['SI'],
-
             firmaTecnico: [''],
             fechaFirmaTecnico: [''],
             firmaCoordinador: [''],
@@ -126,11 +123,10 @@ export class ChecklistFormComponent implements OnInit {
             this.form.patchValue({ estacion: station });
         }
         if (vhfId) {
-            const id = parseInt(vhfId);
-            this.form.patchValue({ equipoId: id });
+            const idValue = parseInt(vhfId);
+            this.form.patchValue({ equipoId: idValue });
 
-            // Cargar info del equipo para vincularlo correctamente
-            this.equipmentService.getEquipmentById(id).subscribe({
+            this.equipmentService.getEquipmentById(idValue).subscribe({
                 next: (equipo) => {
                     if (equipo) {
                         this.form.patchValue({
@@ -145,32 +141,31 @@ export class ChecklistFormComponent implements OnInit {
     }
 
     loadUsers() {
-        this.authService.user$.subscribe(user => {
-            if (user) {
-                this.equipmentService.getUsers().subscribe(users => {
-                    this.users = users.map(u => ({
-                        ...u,
-                        nombre: u.personal?.nombre || '',
-                        apellido: u.personal?.apellido || u.email,
-                        aeropuertoCodigo: u.personal?.aeropuerto?.codigo,
-                        firNombre: u.personal?.fir?.nombre,
-                        personal: u.personal
-                    }));
+        // Usar el valor del signal de authService
+        if (this.authService.user()) {
+            this.equipmentService.getUsers().subscribe(usersData => {
+                const mappedUsers = usersData.map(u => ({
+                    ...u,
+                    nombre: u.personal?.nombre || '',
+                    apellido: u.personal?.apellido || u.email,
+                    aeropuertoCodigo: u.personal?.aeropuerto?.codigo,
+                    firNombre: u.personal?.fir?.nombre,
+                    personal: u.personal
+                }));
+                this.users.set(mappedUsers);
 
-                    // Si ya tenemos parámetros de estación o un checklist cargado, filtramos
-                    const station = this.form.get('estacion')?.value || this.route.snapshot.queryParamMap.get('station');
-                    if (station) {
-                        this.filterUsersForStation({ estacion: station });
-                    }
-                });
-            }
-        });
+                const station = this.form.get('estacion')?.value || this.route.snapshot.queryParamMap.get('station');
+                if (station) {
+                    this.filterUsersForStation({ estacion: station });
+                }
+            });
+        }
     }
 
     loadChecklist() {
-        if (!this.id) return;
-        this.loading = true;
-        this.checklistService.getChecklist(this.id).subscribe({
+        if (!this.id()) return;
+        this.loading.set(true);
+        this.checklistService.getChecklist(this.id()!).subscribe({
             next: (data) => {
                 const { fecha, ...rest } = data;
                 this.form.patchValue({
@@ -178,97 +173,90 @@ export class ChecklistFormComponent implements OnInit {
                     fecha: fecha ? fecha.split('T')[0] : ''
                 });
 
-                // Una vez cargado el checklist, filtrat los usuarios según la ubicación del equipo
                 this.filterUsersForStation(data);
 
-                if (this.mode === 'view') {
+                if (this.isView()) {
                     this.form.disable();
                 }
-                this.loading = false;
+                this.loading.set(false);
             },
             error: (err) => {
                 console.error(err);
-                this.loading = false;
+                this.loading.set(false);
                 this.router.navigate(['/checklists']);
             }
         });
     }
 
     private filterUsersForStation(checklist: any) {
-        if (!this.users.length) return;
+        const allUsers = this.users();
+        if (!allUsers.length) return;
 
-        // Extraer aeródromo y FIR del equipo/estación
         const stationAero = checklist.aeropuerto?.codigo || checklist.equipo?.vhf?.aeropuerto || '';
         const stationFir = checklist.aeropuerto?.fir?.nombre || checklist.equipo?.vhf?.fir || '';
 
-        // TÉCNICOS LOCALES: Los asignados a este aeropuerto específico
-        this.localUsers = this.users.filter(u =>
+        const locals = allUsers.filter(u =>
             u.aeropuertoCodigo === stationAero ||
             (u.personal?.aeropuerto?.nombre && checklist.estacion.toUpperCase().includes(u.personal.aeropuerto.nombre.toUpperCase()))
         );
+        this.localUsers.set(locals.length ? locals : allUsers);
 
-        // TÉCNICOS REGIONALES: Los del centro regional (Mendoza/DOZ)
-        this.regionalUsers = this.users.filter(u =>
+        const regionals = allUsers.filter(u =>
             u.firNombre === stationFir ||
             ['DOZ', 'MENDOZA'].includes(u.firNombre?.toUpperCase()) ||
             ['DOZ', 'MENDOZA'].includes(u.personal?.fir?.nombre?.toUpperCase())
         );
-
-        // Fallback: Si no hay específicos, mostrar todos para no bloquear el proceso
-        if (this.localUsers.length === 0) this.localUsers = this.users;
-        if (this.regionalUsers.length === 0) this.regionalUsers = this.users;
+        this.regionalUsers.set(regionals.length ? regionals : allUsers);
     }
 
     onSubmit() {
         if (this.form.invalid) return;
 
-        this.loading = true;
+        this.loading.set(true);
         const formData = this.form.getRawValue();
         const payload = {
             ...formData,
             fecha: new Date(formData.fecha).toISOString()
         };
 
-        const user = this.authService.userValue;
+        const userVal = this.authService.userValue;
 
-        // Auto-fill metadata if missing
-        if (user) {
-            // Asignar el ID del técnico desde el contexto del usuario logueado
+        if (userVal) {
             if (!payload.tecnicoId) {
-                payload.tecnicoId = user.context?.id || user.id;
+                payload.tecnicoId = userVal.context?.id || userVal.id;
             }
 
-            if (user.role === 'TECNICO' && !payload.firmaTecnico) {
-                const signerName = user.context?.nombre && user.context?.apellido
-                    ? `${user.context.nombre} ${user.context.apellido}`
-                    : user.email;
+            if (userVal.role === 'TECNICO' && !payload.firmaTecnico) {
+                const signerName = userVal.context?.nombre && userVal.context?.apellido
+                    ? `${userVal.context.nombre} ${userVal.context.apellido}`
+                    : userVal.email;
                 payload.firmaTecnico = signerName;
                 payload.fechaFirmaTecnico = new Date().toISOString();
             }
         }
 
-        const request = (this.mode === 'edit' && this.id)
-            ? this.checklistService.updateChecklist(this.id, payload)
+        const request = (this.mode() === 'edit' && this.id())
+            ? this.checklistService.updateChecklist(this.id()!, payload)
             : this.checklistService.postChecklist(payload);
 
         request.subscribe({
             next: () => {
-                this.showSuccessModal = true;
-                this.loading = false;
+                this.showSuccessModal.set(true);
+                this.loading.set(false);
             },
             error: (err) => {
                 console.error(err);
-                this.loading = false;
+                this.loading.set(false);
             }
         });
     }
 
     handleSign(role: 'TECNICO' | 'COORDINADOR' | 'REGIONAL' | 'LOCAL', name: string) {
-        const now = new Date().toISOString();
+        const nowStr = new Date().toISOString();
         if (role === 'TECNICO') {
-            this.form.patchValue({ firmaTecnico: name, fechaFirmaTecnico: now });
+            this.form.patchValue({ firmaTecnico: name, fechaFirmaTecnico: nowStr });
         } else if (role === 'COORDINADOR') {
-            this.form.patchValue({ firmaCoordinador: name, fechaFirmaCoordinador: now });
+            this.form.patchValue({ firmaCoordinador: name, fechaFirmaCoordinador: nowStr });
         } else if (role === 'LOCAL') {
             this.form.patchValue({ firma_digital_local: name });
         } else if (role === 'REGIONAL') {
@@ -277,13 +265,11 @@ export class ChecklistFormComponent implements OnInit {
     }
 
     handleSuccessClose() {
-        this.showSuccessModal = false;
+        this.showSuccessModal.set(false);
         this.router.navigate(['/checklists']);
     }
 
     print() {
         window.print();
     }
-
-    get isView() { return this.mode === 'view'; }
 }

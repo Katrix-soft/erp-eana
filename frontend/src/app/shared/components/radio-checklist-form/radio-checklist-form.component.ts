@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../../core/services/toast.service';
+import { inject } from '@angular/core';
 
 @Component({
     selector: 'app-radio-checklist-form',
@@ -109,6 +111,7 @@ export class RadioChecklistFormComponent {
     @Input() radioName: string = '';
     @Input() isMain: boolean = false;
 
+    private toastService = inject(ToastService);
     isChecked: boolean = false;
 
     formData = {
@@ -145,6 +148,6 @@ export class RadioChecklistFormComponent {
             ...this.formData
         });
         // Here you would call an API service to save the data
-        alert('Checklist guardado correctamente');
+        this.toastService.success('Checklist guardado correctamente');
     }
 }
