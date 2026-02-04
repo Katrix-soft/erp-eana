@@ -1,28 +1,17 @@
 services:
-  # Redis - Cache liviano sin persistencia
   redis:
     image: redis:7-alpine
     container_name: cns_redis
     restart: always
     command: >
-      redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru --save "" --appendonly no --loglevel warning
+      redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru --save "" --appendonly no
     networks:
       - internal
-    ports:
-      - "6379:6379"
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 3
-    deploy:
-      resources:
-        limits:
-          cpus: '0.3'
-          memory: 150M
-        reservations:
-          cpus: '0.1'
-          memory: 100M
 
   postgres:
     image: postgres:15-alpine
@@ -36,10 +25,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - internal
-    ports:
-      - "5434:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -60,19 +47,15 @@ services:
       POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: cns_db
 
-      # Redis Cache Configuration
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_TTL: 300
       CACHE_ENABLED: "true"
 
-      # CORS Configuration
-      CORS_ORIGIN: "http://localhost:4200,http://localhost:8080"
+      CORS_ORIGIN: "https://app.katrix.com.ar"
 
       JWT_SECRET: ${JWT_SECRET}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-    ports:
-      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -83,11 +66,6 @@ services:
       - npm_network
     volumes:
       - uploads_data:/app/uploads
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3000/health" ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
 
   frontend:
     build:
@@ -100,13 +78,6 @@ services:
     networks:
       - internal
       - npm_network
-    ports:
-      - "4200:8080"
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080" ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
 
 networks:
   internal:
