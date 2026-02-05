@@ -65,7 +65,7 @@ async function main() {
                 columns: true,
                 skip_empty_lines: true,
                 relax_quotes: true
-            });
+            }) as any[];
 
             if (records.length === 0) continue;
 
@@ -95,7 +95,7 @@ async function main() {
                 try {
                     await client.query(query, values);
                     inserted++;
-                } catch (e) {
+                } catch (e: any) {
                     // Ignore some errors or log verbose?
                     if (!e.message.includes('duplicate key')) {
                         console.error(`Error inserting into ${item.table}: ${e.message}`);
@@ -107,14 +107,14 @@ async function main() {
             // Reset sequence
             try {
                 await client.query(`SELECT setval(pg_get_serial_sequence('${item.table}', 'id'), COALESCE(MAX(id), 1)) FROM "${item.table}"`);
-            } catch (e) {
+            } catch (e: any) {
                 // Ignore if table doesn't have id sequence
             }
         }
 
         console.log('🎉 Restoration Complete');
 
-    } catch (e) {
+    } catch (e: any) {
         console.error('❌ Fatal Error:', e);
     } finally {
         await client.end();
