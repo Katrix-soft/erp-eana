@@ -73,7 +73,7 @@ class BootstrapOrchestrator {
 
     private async isTaskExecuted(name: string): Promise<boolean> {
         const res = await this.db.query('SELECT id FROM "_bootstrap_history" WHERE task_name = $1 AND status = $2', [name, 'SUCCESS']);
-        return res.rowCount > 0;
+        return (res.rowCount || 0) > 0;
     }
 
     private async markTaskStatus(name: string, status: 'SUCCESS' | 'FAILED') {

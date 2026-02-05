@@ -6,7 +6,7 @@ import { parse } from 'csv-parse/sync';
 
 require('dotenv').config();
 
-const DATA_DIR = path.join(__dirname, '..'); // The CSVs are in the backend/ root in the container
+const DATA_DIR = path.join(__dirname, '../..'); // The CSVs are in the backend/ root in the container
 
 // Map filename to table name
 const FILES_TO_TABLES = [
