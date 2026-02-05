@@ -18,7 +18,9 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
-        "restore-data": "ts-node scripts/restore-from-csv.ts"
+        "restore-data": "ts-node scripts/restore-from-csv.ts",
+        "bootstrap": "ts-node scripts/bootstrap.ts",
+        "bootstrap:prod": "node dist/scripts/bootstrap.js"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",
