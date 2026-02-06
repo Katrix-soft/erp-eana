@@ -1,27 +1,43 @@
-
+import { Client } from 'pg';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 
-const prisma = new PrismaClient();
+dotenv.config();
+
+const client = new Client({
+    host: process.env.POSTGRES_HOST || 'localhost',
+    port: parseInt(process.env.POSTGRES_PORT || '5434'),
+    user: process.env.POSTGRES_USER || 'postgres',
+    password: process.env.POSTGRES_PASSWORD || 'postgrespassword',
+    database: process.env.POSTGRES_DB || 'cns_db',
+});
 
 async function main() {
-    console.log('🔧 Agregando columnas frecuencia y canal...\n');
+    console.log('🔧 Agregando columnas frecuencia y canal si no existen...\n');
 
     try {
-        await prisma.$executeRawUnsafe(`
+        await client.connect();
+        await client.query(`
             ALTER TABLE comunicaciones 
             ADD COLUMN IF NOT EXISTS frecuencia DOUBLE PRECISION,
             ADD COLUMN IF NOT EXISTS canal VARCHAR(255);
         `);
-        console.log('✅ Columnas agregadas\n');
-    } catch (error) {
-        console.log('⚠️  Las columnas ya existen o hubo un error:', error);
+        console.log('✅ Columnas verificadas/agregadas\n');
+    } catch (error: any) {
+        console.log('⚠️  Error al verificar columnas:', error.message);
     }
 
     console.log('🔄 Actualizando frecuencias y canales desde Excel...\n');
 
     // Leer el archivo Excel
-    const filePath = path.join(__dirname, '..', '..', 'Equipamiento VHF Nacional.xlsx');
+    const filePath = path.join(__dirname, '../../..', 'data/excel', 'Equipamiento VHF Nacional.xlsx');
+    if (!fs.existsSync(filePath)) {
+        console.warn(`⚠️ Archivo Excel no encontrado: ${filePath}`);
+        return;
+    }
+
     const workbook = XLSX.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
@@ -43,14 +59,14 @@ async function main() {
             }
 
             // Actualizar directamente con SQL
-            const result = await prisma.$executeRawUnsafe(`
+            const res = await client.query(`
                 UPDATE comunicaciones 
-                SET frecuencia = ${parseFloat(frecuencia.toString())},
-                    canal = '${canal || ''}'
-                WHERE LOWER(numero_serie) LIKE LOWER('%${numeroSerie}%')
-            `);
+                SET frecuencia = $1,
+                    canal = $2
+                WHERE LOWER(numero_serie) LIKE LOWER($3)
+            `, [parseFloat(frecuencia.toString()), canal || '', `%${numeroSerie}%`]);
 
-            if (result > 0) {
+            if (res.rowCount && res.rowCount > 0) {
                 updated++;
                 if (updated % 100 === 0) {
                     console.log(`✅ Actualizados: ${updated}...`);
@@ -78,5 +94,5 @@ main()
         process.exit(1);
     })
     .finally(async () => {
-        await prisma.$disconnect();
+        await client.end().catch(() => { });
     });

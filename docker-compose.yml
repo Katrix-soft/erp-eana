@@ -66,8 +66,8 @@ services:
     networks:
       - erp-eana_internal
       - npm_network
-    command: >
-      sh -c "npm run bootstrap:prod -- --all && node dist/main.js"
+    ports:
+      - "3000:3000"
     healthcheck:
       test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3000/health" ]
       interval: 30s
@@ -80,6 +80,8 @@ services:
       dockerfile: Dockerfile
     container_name: cns_frontend
     restart: always
+    ports:
+      - "4200:8080"
     depends_on:
       - backend
     networks:
@@ -95,7 +97,7 @@ networks:
   erp-eana_internal:
     driver: bridge
   npm_network:
-    external: true
+    driver: bridge
 
 volumes:
   postgres_data:

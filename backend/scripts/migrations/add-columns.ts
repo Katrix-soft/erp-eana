@@ -1,32 +1,37 @@
-import { PrismaClient } from '@prisma/client';
+import { Client } from 'pg';
+import * as dotenv from 'dotenv';
 
-const prisma = new PrismaClient();
+dotenv.config();
+
+const client = new Client({
+    host: process.env.POSTGRES_HOST || 'localhost',
+    port: parseInt(process.env.POSTGRES_PORT || '5434'),
+    user: process.env.POSTGRES_USER || 'postgres',
+    password: process.env.POSTGRES_PASSWORD || 'postgrespassword',
+    database: process.env.POSTGRES_DB || 'cns_db',
+});
 
 async function main() {
-    console.log('🔧 Agregando columnas frecuencia y canal...\n');
+    console.log('🔧 Agregando columnas frecuencia y canal si no existen...\n');
 
     try {
-        await prisma.$executeRawUnsafe(`ALTER TABLE comunicaciones ADD COLUMN IF NOT EXISTS frecuencia DOUBLE PRECISION;`);
-        console.log('✅ Columna frecuencia agregada');
-    } catch (error: any) {
-        console.log('⚠️  Columna frecuencia:', error.message);
-    }
+        await client.connect();
 
-    try {
-        await prisma.$executeRawUnsafe(`ALTER TABLE comunicaciones ADD COLUMN IF NOT EXISTS canal VARCHAR(255);`);
-        console.log('✅ Columna canal agregada\n');
-    } catch (error: any) {
-        console.log('⚠️  Columna canal:', error.message);
-    }
+        await client.query(`ALTER TABLE comunicaciones ADD COLUMN IF NOT EXISTS frecuencia DOUBLE PRECISION;`);
+        console.log('✅ Columna frecuencia verificada/agregada');
 
-    console.log('✅ Proceso completado');
+        await client.query(`ALTER TABLE comunicaciones ADD COLUMN IF NOT EXISTS canal VARCHAR(255);`);
+        console.log('✅ Columna canal verificada/agregada\n');
+
+        console.log('✅ Proceso completado');
+    } catch (error: any) {
+        console.error('❌ Error fatal:', error.message);
+    } finally {
+        await client.end();
+    }
 }
 
-main()
-    .catch((e) => {
-        console.error('❌ Error fatal:', e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+main().catch((e) => {
+    console.error('❌ Error fatal:', e);
+    process.exit(1);
+});

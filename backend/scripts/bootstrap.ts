@@ -7,16 +7,28 @@ import * as fs from 'fs';
 /**
  * EANA ERP - System Bootstrap Orchestrator
  * Arquitectura: Módulos dinámicos con ejecución secuencial e idempotente.
- * Funciona tanto en Desarrollo (TS) como en Producción (JS/Dist).
+ * Esta versión está optimizada para ejecutarse tanto localmente como en Docker.
  */
 
-dotenv.config();
+// Cargar .env: El orden importa. Cargamos primero los de la raíz y al final el de backend/
+// para que el específico (localhost) sobreescriba al genérico (docker/postgres)
+const envPaths = [
+    path.join(__dirname, '../../.env'), // Root .env
+    path.join(process.cwd(), '../.env'), // Root .env (si se corre desde backend)
+    path.join(__dirname, '../.env'),    // Backend .env
+    path.join(process.cwd(), '.env'),   // Backend .env (si se corre desde backend)
+];
 
-// --- Utilidad de Logging para Producción ---
+for (const p of envPaths) {
+    if (fs.existsSync(p)) {
+        dotenv.config({ path: p, override: true });
+    }
+}
+
 const Log = {
-    info: (msg: string) => console.log(`[${new Date().toISOString()}] [INFO] 🔵 ${msg}`),
+    info: (msg: string) => console.log(`[${new Date().toISOString()}] [INFO]  🔵 ${msg}`),
     success: (msg: string) => console.log(`[${new Date().toISOString()}] [SUCCESS] ✅ ${msg}`),
-    warn: (msg: string) => console.log(`[${new Date().toISOString()}] [WARN] ⚠️ ${msg}`),
+    warn: (msg: string) => console.log(`[${new Date().toISOString()}] [WARN]  ⚠️  ${msg}`),
     error: (msg: string, err?: any) => {
         console.error(`[${new Date().toISOString()}] [ERROR] ❌ ${msg}`);
         if (err) {
@@ -29,8 +41,8 @@ const Log = {
 interface BootstrapTask {
     name: string;
     description: string;
-    fileName: string; // Nombre del archivo sin extensión
-    critical: boolean; // Si falla, se detiene el bootstrap
+    fileName: string;
+    critical: boolean;
 }
 
 class BootstrapOrchestrator {
@@ -41,20 +53,22 @@ class BootstrapOrchestrator {
 
     constructor() {
         this.flags = process.argv.slice(2);
-        // Detectamos si estamos en dist o en src/scripts
         this.isProd = __filename.endsWith('.js');
         this.scriptsDir = __dirname;
 
+        const port = parseInt(process.env.POSTGRES_PORT || '5432');
+
+        Log.info(`Configurando conexión a DB: ${process.env.POSTGRES_HOST || 'localhost'}:${port} (DB: ${process.env.POSTGRES_DB || 'cns_db'})`);
+
         this.db = new Client({
             host: process.env.POSTGRES_HOST || 'localhost',
-            port: parseInt(process.env.POSTGRES_PORT || '5434'),
+            port: port,
             user: process.env.POSTGRES_USER || 'postgres',
             password: process.env.POSTGRES_PASSWORD || 'postgrespassword',
             database: process.env.POSTGRES_DB || 'cns_db',
         });
     }
 
-    // --- Control de Idempotencia mediante DB ---
     private async ensureControlTable() {
         try {
             await this.db.query(`
@@ -66,7 +80,7 @@ class BootstrapOrchestrator {
                 );
             `);
         } catch (e) {
-            Log.error('Error creating control table', e);
+            Log.error('Error creating control table. Verifique credenciales de DB.', e);
             throw e;
         }
     }
@@ -84,17 +98,20 @@ class BootstrapOrchestrator {
             [name, status]);
     }
 
-    // --- Definición de la Secuencia ---
     private getTasks(): BootstrapTask[] {
         const tasks: BootstrapTask[] = [
-            { name: 'migrate', description: 'Database Schema Sync/Migration', fileName: 'sync-schema', critical: true },
-            { name: 'seed-admin', description: 'Ensure Admin User', fileName: 'ensure-admin', critical: true },
-            { name: 'seed-airports', description: 'Seed Airports Data', fileName: 'seed-airports', critical: false },
-            { name: 'import-csv', description: 'Restore Data from CSVs', fileName: 'restore-from-csv', critical: false },
-            { name: 'verify', description: 'Final System Summary', fileName: 'verify-summary', critical: false },
+            { name: 'migrate', description: 'Database Schema Sync', fileName: 'migrations/sync-schema', critical: true },
+            { name: 'seed-basic', description: 'Basic Data (FIRs, Posts)', fileName: 'seeds/seed-basic-data', critical: true },
+            { name: 'seed-admin', description: 'Admin User Setup', fileName: 'seeds/ensure-admin', critical: true },
+            { name: 'seed-airports', description: 'Airports Master Load', fileName: 'seeds/seed-airports', critical: false },
+            { name: 'seed-nav', description: 'Navigation Equipment Load', fileName: 'seeds/seed-nav', critical: false },
+            { name: 'seed-chat', description: 'Chat Rooms Initialization', fileName: 'seeds/seed-chat-rooms', critical: false },
+            { name: 'seed-forum', description: 'Forum Initial Data', fileName: 'seeds/seed-forum-chat', critical: false },
+            { name: 'update-freq', description: 'VHF Frequencies Update', fileName: 'maintenance/update-frequencies', critical: false },
+            { name: 'import-csv', description: 'Full CSV Data Restoration', fileName: 'imports/restore-from-csv', critical: false },
+            { name: 'verify', description: 'System Verification Summary', fileName: 'verifications/verify-summary', critical: false },
         ];
 
-        // Si se proveen flags específicos (que no sean --all o --force) filtrados
         const validTaskFlags = this.flags.filter(f => !f.startsWith('--all') && !f.startsWith('--force'));
 
         if (validTaskFlags.length > 0) {
@@ -107,8 +124,40 @@ class BootstrapOrchestrator {
     public async run() {
         Log.info(`🚀 Starting Bootstrap Orchestration (ENV: ${this.isProd ? 'PROD' : 'DEV'})...`);
 
+        const maxRetries = 5;
+        let retryCount = 0;
+
+        while (retryCount < maxRetries) {
+            try {
+                // Re-initialize client for each attempt to avoid 'Client has already been connected' error
+                this.db = new Client({
+                    host: process.env.POSTGRES_HOST || 'localhost',
+                    port: parseInt(process.env.POSTGRES_PORT || '5432'),
+                    user: process.env.POSTGRES_USER || 'postgres',
+                    password: process.env.POSTGRES_PASSWORD || 'postgrespassword',
+                    database: process.env.POSTGRES_DB || 'cns_db',
+                });
+
+                await this.db.connect();
+                Log.success('✅ Database connected successfully.');
+                break;
+            } catch (err) {
+                retryCount++;
+                Log.warn(`Database connection failed (Attempt ${retryCount}/${maxRetries}): ${err.message}`);
+                // Ensure client is ended if possible, though new assignment will GC it eventually
+                try { await this.db.end(); } catch (e) { }
+
+                if (retryCount >= maxRetries) {
+                    Log.error('❌ Could not connect to database after multiple attempts.');
+                    process.exit(1);
+                }
+                const waitTime = 2000 * retryCount;
+                Log.info(`Waiting ${waitTime / 1000}s before retrying...`);
+                await new Promise(res => setTimeout(res, waitTime));
+            }
+        }
+
         try {
-            await this.db.connect();
             await this.ensureControlTable();
 
             const tasks = this.getTasks();
@@ -125,15 +174,14 @@ class BootstrapOrchestrator {
                 Log.info(`[${task.name.toUpperCase()}] Running: ${task.description}...`);
 
                 try {
-                    // Resolvemos la ruta del archivo (soporte .ts y .js)
                     const extension = this.isProd ? '.js' : '.ts';
                     const scriptPath = path.join(this.scriptsDir, `${task.fileName}${extension}`);
 
                     if (!fs.existsSync(scriptPath)) {
-                        throw new Error(`Script file not found: ${scriptPath}`);
+                        Log.warn(`Script not found: ${scriptPath}. Skipping.`);
+                        continue;
                     }
 
-                    // Determinar el comando a ejecutar
                     let command: string;
                     let args: string[];
 
@@ -141,8 +189,6 @@ class BootstrapOrchestrator {
                         command = 'node';
                         args = [scriptPath];
                     } else {
-                        // En DEV usamos npx ts-node
-                        // Usamos --transpile-only para velocidad
                         command = 'npx';
                         args = ['ts-node', '--transpile-only', scriptPath];
                     }
@@ -152,12 +198,13 @@ class BootstrapOrchestrator {
                     await new Promise<void>((resolve, reject) => {
                         const child = spawn(command, args, {
                             stdio: 'inherit',
-                            env: { ...process.env, BOOTSTRAP_MODE: 'true' }
+                            env: { ...process.env, BOOTSTRAP_MODE: 'true' },
+                            shell: process.platform === 'win32'
                         });
 
                         child.on('close', (code) => {
                             if (code === 0) resolve();
-                            else reject(new Error(`Script [${task.fileName}] exited with code ${code}`));
+                            else reject(new Error(`Exit code ${code}`));
                         });
 
                         child.on('error', (err) => {
@@ -173,21 +220,20 @@ class BootstrapOrchestrator {
                     Log.error(`Task [${task.name}] failed!`, error);
 
                     if (task.critical) {
-                        Log.error('CRITICAL ERROR: Aborting bootstrap.');
+                        Log.error('CRITICAL ERROR: Aborting bootstrap sequence.');
                         process.exit(1);
                     }
                 }
             }
 
-            Log.success('🎉 Full Bootstrap process completed.');
+            Log.success('🎉 Full Bootstrap process completed successfully.');
         } catch (err) {
             Log.error('Fatal error during bootstrap', err);
             process.exit(1);
         } finally {
-            await this.db.end();
+            await this.db.end().catch(() => { });
         }
     }
 }
 
-// Iniciar
 new BootstrapOrchestrator().run();

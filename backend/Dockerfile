@@ -32,8 +32,8 @@ RUN npm run build
 # ============================================
 FROM node:20-alpine
 
-# Install wget for healthcheck
-RUN apk add --no-cache wget
+# Install wget and netcat for healthcheck and entrypoint
+RUN apk add --no-cache wget netcat-openbsd
 
 WORKDIR /app
 
@@ -51,11 +51,16 @@ COPY --from=build --chown=nestjs:nodejs /app/package*.json ./
 # Copy necessary files
 COPY --chown=nestjs:nodejs scripts ./scripts
 COPY --chown=nestjs:nodejs data ./data
-COPY --chown=nestjs:nodejs *.csv ./
+COPY --chown=nestjs:nodejs docs ./docs
+COPY --chown=nestjs:nodejs manuals ./manuals
+COPY --chown=nestjs:nodejs docker-entrypoint.sh ./
+
+# Make entrypoint executable
+RUN chmod +x docker-entrypoint.sh
 
 # Create directories with proper permissions
 RUN mkdir -p uploads logs && \
-    chown -R nestjs:nodejs uploads logs
+    chown -R nestjs:nodejs uploads logs data uploads docs manuals
 
 # Switch to non-root user
 USER nestjs
@@ -67,6 +72,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD wget --spider -q http://localhost:3000/health || exit 1
 
-# Start application
-CMD ["node", "dist/main.js"]
-
+# Start application via entrypoint script
+ENTRYPOINT ["./docker-entrypoint.sh"]

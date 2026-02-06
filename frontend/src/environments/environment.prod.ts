@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
     apiUrl: '/api/v1',
-    socketUrl: window.location.origin
+    socketUrl: '/'
 };

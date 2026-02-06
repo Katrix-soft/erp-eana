@@ -68,7 +68,7 @@ import { AppService } from './app.service';
                 return {
                     type: 'postgres',
                     host: config.get<string>('POSTGRES_HOST', 'localhost'),
-                    port: config.get<number>('POSTGRES_PORT', 5434),
+                    port: config.get<number>('POSTGRES_PORT', 5433),
                     username: config.get<string>('POSTGRES_USER', 'postgres'),
                     password: config.get<string>('POSTGRES_PASSWORD', 'postgrespassword'),
                     database: config.get<string>('POSTGRES_DB', 'cns_db'),

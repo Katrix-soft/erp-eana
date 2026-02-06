@@ -6,7 +6,7 @@
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
-        "build": "nest build",
+        "build": "nest build && npm run build:scripts",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "start": "nest start",
         "start:dev": "nest start --watch",
@@ -20,6 +20,7 @@
         "test:e2e": "jest --config ./test/jest-e2e.json",
         "restore-data": "ts-node scripts/imports/restore-from-csv.ts",
         "bootstrap": "ts-node scripts/bootstrap.ts",
+        "build:scripts": "tsc -p tsconfig.scripts.json",
         "bootstrap:prod": "node dist/scripts/bootstrap.js"
     },
     "dependencies": {

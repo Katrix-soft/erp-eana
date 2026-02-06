@@ -1,0 +1,29 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "./dist/scripts",
+        "rootDir": "./scripts",
+        "declaration": false
+    },
+    "include": [
+        "scripts/bootstrap.ts",
+        "scripts/migrations/sync-schema.ts",
+        "scripts/seeds/ensure-admin.ts",
+        "scripts/seeds/seed-airports.ts",
+        "scripts/seeds/seed-chat-rooms.ts",
+        "scripts/seeds/seed-forum-chat.ts",
+        "scripts/seeds/seed-basic-data.ts",
+        "scripts/seeds/seed-nav.ts",
+        "scripts/maintenance/update-frequencies.ts",
+        "scripts/imports/restore-from-csv.ts",
+        "scripts/verifications/verify-summary.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "diagnostics",
+        "maintenance/fix",
+        "maintenance/legacy",
+        "maintenance/utils"
+    ]
+}
