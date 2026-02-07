@@ -35,7 +35,6 @@ export class DashboardService {
             });
 
             // 2. Prepare Queries
-            // 2. Prepare Queries
             // Communications: Query 'Equipo' directly to get the REAL count of equipments, not just sites
             const commsQb = this.equipoRepository.createQueryBuilder('equipo')
                 .leftJoinAndSelect('equipo.vhf', 'vhf')
@@ -53,10 +52,17 @@ export class DashboardService {
                 if (personal.aeropuertoId) {
                     const aeroId = personal.aeropuertoId;
                     const aeroNombre = personal.aeropuerto?.nombre; // e.g. "SAEZ", "EZE"
+                    const aeroCodigo = personal.aeropuerto?.codigo; // e.g. "SAEZ"
 
-                    // Filter VHF (via joined relation)
-                    if (aeroNombre) {
-                        commsQb.andWhere('vhf.aeropuerto = :aeroNombre', { aeroNombre });
+                    this.logger.log(`🔍 Filtering for user: aeroId=${aeroId}, aeroNombre=${aeroNombre}, aeroCodigo=${aeroCodigo}`);
+
+                    // Filter VHF (via joined relation) - try both nombre and codigo
+                    if (aeroNombre || aeroCodigo) {
+                        const conditions = [];
+                        if (aeroNombre) conditions.push('vhf.aeropuerto = :aeroNombre');
+                        if (aeroCodigo) conditions.push('vhf.aeropuerto = :aeroCodigo');
+
+                        commsQb.andWhere(`(${conditions.join(' OR ')})`, { aeroNombre, aeroCodigo });
                     }
 
                     // Filter others by ID
@@ -65,7 +71,10 @@ export class DashboardService {
                     enerQb.andWhere('energia.aeropuertoId = :aeroId', { aeroId });
                 } else if (personal.firId) {
                     // Filter by FIR logic if needed (not fully implemented in CSV imports yet)
+                    this.logger.log(`🔍 Filtering by FIR: ${personal.firId}`);
                 }
+            } else {
+                this.logger.log(`🌍 Global admin view - no filtering applied`);
             }
 
             // 4. Exec Queries
@@ -77,6 +86,18 @@ export class DashboardService {
             ]);
 
             this.logger.log(`📊 Dashboard Counts: VHF Equipments=${comms.length}, Nav=${nav.length}, Vig=${vig.length}, Ener=${ener.length}`);
+
+            // Log sample data for debugging
+            if (comms.length > 0) {
+                this.logger.log(`📡 Sample comm equipment: ${JSON.stringify({
+                    id: comms[0].id,
+                    vhfId: comms[0].vhfId,
+                    estado: comms[0].estado,
+                    vhf: comms[0].vhf ? { sitio: comms[0].vhf.sitio, aeropuerto: comms[0].vhf.aeropuerto } : null
+                })}`);
+            } else {
+                this.logger.warn(`⚠️ No communication equipments found!`);
+            }
 
             // 5. Aggregate Stats
             const stats = {

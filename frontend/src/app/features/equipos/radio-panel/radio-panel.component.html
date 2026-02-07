@@ -34,7 +34,7 @@
     </div>
 
     <!-- Grid -->
-    <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+    <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         <div *ngFor="let radio of filteredRadios"
             class="group relative bg-gradient-to-br from-slate-900 to-slate-950 rounded-3xl overflow-hidden border-2 transition-all duration-500 transform hover:-translate-y-1 hover:shadow-2xl"
             [ngClass]="getCardStyles(radio.estado)">
@@ -43,7 +43,7 @@
             <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b" [ngClass]="getBumperStyles(radio.estado)">
             </div>
 
-            <div class="px-6 py-5 flex flex-col min-h-[300px] relative z-10 w-full">
+            <div class="px-6 py-6 flex flex-col min-h-[340px] relative z-10 w-full">
 
                 <!-- Badge "CON NOVEDAD" en la esquina superior derecha -->
                 <div *ngIf="radio.estado !== 'OK'"

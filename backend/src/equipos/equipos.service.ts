@@ -83,13 +83,18 @@ export class EquiposService {
             if (filters?.aeropuerto) {
                 //  vhfWhere.OR = [ { aeropuerto: { contains... } }, { sitio: { contains... } } ]
                 // plus ID lookup logic
-                qb.andWhere(`(vhf.aeropuerto ILIKE :apt OR vhf.sitio ILIKE :apt)`, { apt: `%${filters.aeropuerto}%` });
+                // Try exact match first for better precision
+                qb.andWhere(
+                    `(vhf.aeropuerto = :aptExact OR vhf.aeropuerto ILIKE :aptPartial OR vhf.sitio ILIKE :aptPartial)`,
+                    { aptExact: filters.aeropuerto, aptPartial: `%${filters.aeropuerto}%` }
+                );
             }
             if (filters?.fir) {
                 qb.andWhere(`vhf.fir ILIKE :fir`, { fir: `%${filters.fir}%` });
             }
 
             const vhfRecords = await qb.getMany();
+            console.log(`📡 VHF records found: ${vhfRecords.length} for filters:`, filters);
 
             // Map to result
             vhfRecords.forEach(vhf => {
@@ -129,13 +134,18 @@ export class EquiposService {
                 .leftJoinAndSelect('aeropuerto.fir', 'firRel');
 
             if (filters?.aeropuerto) {
-                qb.andWhere(`(nav.oaci ILIKE :apt OR nav.nombre ILIKE :apt OR nav.siglasLocal ILIKE :apt OR aeropuerto.codigo ILIKE :apt OR aeropuerto.nombre ILIKE :apt)`, { apt: `%${filters.aeropuerto}%` });
+                // More flexible search - try exact match first, then partial
+                qb.andWhere(
+                    `(nav.oaci = :aptExact OR nav.nombre ILIKE :aptPartial OR nav.siglasLocal ILIKE :aptPartial OR aeropuerto.codigo = :aptExact OR aeropuerto.nombre ILIKE :aptPartial)`,
+                    { aptExact: filters.aeropuerto, aptPartial: `%${filters.aeropuerto}%` }
+                );
             }
             if (filters?.fir) {
                 qb.andWhere(`(nav.fir ILIKE :fir OR firRel.nombre ILIKE :fir)`, { fir: `%${filters.fir}%` });
             }
 
             const radioayudas = await qb.getMany();
+            console.log(`📡 Navigation equipments found: ${radioayudas.length} for filters:`, filters);
 
             equipos.push(...radioayudas.map(nav => ({
                 id: nav.id + 10000,
