@@ -25,6 +25,30 @@ export interface Energia {
     firRel?: any;
 }
 
+export interface ComponenteTablero {
+    id: number;
+    tipo: 'TERMICA' | 'DISYUNTOR' | 'PROTECCION_SOBRE_TENSION' | 'OTRO';
+    nombre: string;
+    amperaje?: string;
+    marca?: string;
+    modelo?: string;
+    polos?: number;
+    tableroId: number;
+    createdAt?: Date;
+}
+
+export interface TableroElectrico {
+    id: number;
+    nombre: string;
+    ubicacion?: string;
+    descripcion?: string;
+    estado: 'OK' | 'NOVEDAD' | 'FUERA_SERVICIO';
+    aeropuertoId?: number;
+    aeropuerto?: any;
+    componentes?: ComponenteTablero[];
+    createdAt?: Date;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -46,5 +70,17 @@ export class EnergiaService {
 
     updateStatus(id: number, estado: string): Observable<Energia> {
         return this.http.patch<Energia>(`${this.apiUrl}/${id}/estado`, { estado });
+    }
+
+    // --- Tableros Eléctricos ---
+
+    getTableros(filters?: { aeropuerto?: string }): Observable<TableroElectrico[]> {
+        let params = new HttpParams();
+        if (filters?.aeropuerto) params = params.set('aeropuerto', filters.aeropuerto);
+        return this.http.get<TableroElectrico[]>(`${this.apiUrl}/tableros`, { params });
+    }
+
+    getTablero(id: number): Observable<TableroElectrico> {
+        return this.http.get<TableroElectrico>(`${this.apiUrl}/tableros/${id}`);
     }
 }

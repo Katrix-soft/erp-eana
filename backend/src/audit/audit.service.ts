@@ -1,12 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditLog } from './entities/audit-log.entity';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class AuditService {
+    private readonly logger = new Logger(AuditService.name);
+
     constructor(
-        @InjectRepository(AuditLog) private auditLogRepository: Repository<AuditLog>
+        @InjectRepository(AuditLog) private auditLogRepository: Repository<AuditLog>,
+        @InjectQueue('audit') private auditQueue: Queue
     ) { }
 
     async log(data: {
@@ -19,22 +24,11 @@ export class AuditService {
         ipAddress?: string;
         userAgent?: string;
     }) {
-        try {
-            const logEntry = this.auditLogRepository.create({
-                userId: data.userId,
-                action: data.action,
-                entity: data.entity,
-                entityId: data.entityId,
-                oldValue: data.oldValue || {},
-                newValue: data.newValue || {},
-                ipAddress: data.ipAddress,
-                userAgent: data.userAgent,
-            });
-            return await this.auditLogRepository.save(logEntry);
-        } catch (error) {
-            console.error('❌ Error saving audit log:', error);
-            // We don't throw to avoid breaking the main flow
-        }
+        // Enviar a la cola para procesamiento en segundo plano
+        return this.auditQueue.add('log-event', data, {
+            removeOnComplete: true,
+            priority: 10 // Prioridad baja para no interferir con procesos críticos
+        });
     }
 
     async findByEntity(entity: string, entityId: number) {
@@ -62,4 +56,5 @@ export class AuditService {
         });
     }
 }
+
 

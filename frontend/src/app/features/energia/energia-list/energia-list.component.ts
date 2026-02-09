@@ -8,6 +8,8 @@ import { LucideAngularModule, Zap, MapPin, Activity, Shield, AlertTriangle, Chec
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { AiAssistantService } from '../../../core/services/ai-assistant.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Wind } from 'lucide-angular';
 
 @Component({
   selector: 'app-energia-list',
@@ -19,10 +21,10 @@ import { AiAssistantService } from '../../../core/services/ai-assistant.service'
       <div class="flex items-center justify-between animate-in slide-in-from-top duration-500">
         <div>
           <h1 class="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-            <lucide-icon [name]="Zap" class="text-yellow-400" [size]="32"></lucide-icon>
-            Equipamiento de Energía
+            <lucide-icon [name]="getTipoIcon()" class="text-yellow-400" [size]="32"></lucide-icon>
+            {{ getTipoTitle() }}
           </h1>
-          <p class="text-slate-400 mt-2">Monitoreo y estado de UPS, Grupos Electrógenos y sistemas de energía</p>
+          <p class="text-slate-400 mt-2">{{ getTipoDescription() }}</p>
         </div>
       </div>
 
@@ -144,7 +146,7 @@ import { AiAssistantService } from '../../../core/services/ai-assistant.service'
         <div class="p-8 bg-slate-900/50 rounded-full mb-6 border border-white/5">
           <lucide-icon [name]="Zap" [size]="64" class="text-slate-700 opacity-20"></lucide-icon>
         </div>
-        <p class="text-xl font-medium text-slate-500">No se encontraron equipos de energía.</p>
+        <p class="text-xl font-medium text-slate-500">No se encontraron equipos de {{ getTipoTitle() }}.</p>
       </div>
 
       <!-- Detalles Modal -->
@@ -232,6 +234,7 @@ export class EnergiaListComponent implements OnInit {
   private toastService: ToastService = inject(ToastService);
   private aiService: AiAssistantService = inject(AiAssistantService);
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private router: Router = inject(Router);
 
   equipamientos: Energia[] = [];
   loading = true;
@@ -249,9 +252,68 @@ export class EnergiaListComponent implements OnInit {
   readonly Settings = Settings;
   readonly Sparkles = Sparkles;
   readonly X = X;
+  readonly Wind = Wind;
+
+  private allEquipamientos: Energia[] = [];
+  currentTipo: string | null = null;
+  private route = inject(ActivatedRoute);
 
   ngOnInit() {
-    this.loadData();
+    this.route.queryParams.subscribe(params => {
+      this.currentTipo = params['tipo'] || null;
+      if (this.allEquipamientos.length > 0) {
+        this.filterData();
+      } else {
+        this.loadData();
+      }
+    });
+  }
+
+  filterData() {
+    if (!this.currentTipo) {
+      this.equipamientos = this.allEquipamientos;
+      return;
+    }
+
+    const type = this.currentTipo.toUpperCase();
+    this.equipamientos = this.allEquipamientos.filter(eq => {
+      const tipo = eq.tipo?.toUpperCase() || '';
+      const grupo = eq.grupo?.toUpperCase() || '';
+
+      if (type === 'UPS') return grupo === 'UPS' || tipo === 'UPS';
+      if (type === 'AA') return grupo === 'AA' || tipo.includes('AIRE') || tipo === 'AA';
+      if (type === 'TABLERO') return grupo.includes('TABLERO') || tipo.includes('TABLERO');
+
+      return true;
+    });
+    this.cdr.markForCheck();
+  }
+
+  getTipoTitle(): string {
+    switch (this.currentTipo?.toUpperCase()) {
+      case 'UPS': return 'Sistemas UPS';
+      case 'AA': return 'Aire Acondicionado';
+      case 'TABLERO': return 'Tableros Eléctricos';
+      default: return 'Equipamiento de Energía';
+    }
+  }
+
+  getTipoDescription(): string {
+    switch (this.currentTipo?.toUpperCase()) {
+      case 'UPS': return 'Monitoreo de Uninterruptible Power Supplies y respaldo de energía';
+      case 'AA': return 'Control de climatización y sistemas de aire acondicionado';
+      case 'TABLERO': return 'Estado de tableros eléctricos de distribución y fuerza';
+      default: return 'Monitoreo y estado de UPS, Grupos Electrógenos y sistemas de energía';
+    }
+  }
+
+  getTipoIcon() {
+    switch (this.currentTipo?.toUpperCase()) {
+      case 'UPS': return Zap;
+      case 'AA': return Wind;
+      case 'TABLERO': return Settings;
+      default: return Zap;
+    }
   }
 
   loadData() {
@@ -267,25 +329,57 @@ export class EnergiaListComponent implements OnInit {
         }
       }
 
-      this.energiaService.getEquipamientos(filters).subscribe({
-        next: (data) => {
-          this.equipamientos = data;
-          this.loading = false;
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          console.error('Error loading energia:', err);
-          this.loading = false;
-          this.cdr.markForCheck();
-        }
-      });
+      if (this.currentTipo?.toUpperCase() === 'TABLERO') {
+        this.energiaService.getTableros(filters).subscribe({
+          next: (data) => {
+            // Mapeamos TableroElectrico a Energia para que la lista lo renderice
+            this.equipamientos = data.map(t => ({
+              id: t.id,
+              referencia: t.nombre,
+              ubicacion: t.ubicacion,
+              estado: t.estado,
+              tipo: 'TABLERO',
+              grupo: 'TABLERO',
+              aeropuerto: t.aeropuerto
+            } as Energia));
+            this.loading = false;
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.error('Error loading tableros:', err);
+            this.loading = false;
+            this.cdr.markForCheck();
+          }
+        });
+      } else {
+        this.energiaService.getEquipamientos(filters).subscribe({
+          next: (data) => {
+            this.allEquipamientos = data;
+            this.filterData();
+            this.loading = false;
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.error('Error loading energia:', err);
+            this.loading = false;
+            this.cdr.markForCheck();
+          }
+        });
+      }
     });
   }
 
+
   verDetalles(eq: Energia) {
-    this.selectedEquipamiento = eq;
-    this.showDetailsModal = true;
-    this.cdr.markForCheck();
+    const isTablero = eq.grupo?.toUpperCase().includes('TABLERO') || eq.tipo?.toUpperCase().includes('TABLERO');
+
+    if (isTablero) {
+      this.router.navigate(['/energia/tableros', eq.id]);
+    } else {
+      this.selectedEquipamiento = eq;
+      this.showDetailsModal = true;
+      this.cdr.markForCheck();
+    }
   }
 
   getOperativosCount() {

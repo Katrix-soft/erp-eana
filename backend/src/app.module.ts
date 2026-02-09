@@ -41,18 +41,26 @@ import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AppController } from './app.controller';
+import { QueuesModule } from './common/queues/queues.module';
 
 
 
+import { BullModule } from '@nestjs/bullmq';
 import { AppService } from './app.service';
-
-// Force Rebuild 2026-02-01
-
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
+        }),
+        BullModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: async (config: ConfigService) => ({
+                connection: {
+                    host: config.get<string>('REDIS_HOST', 'redis'),
+                    port: config.get<number>('REDIS_PORT', 6379),
+                },
+            }),
         }),
         ThrottlerModule.forRoot([{
             ttl: 60000,
@@ -110,6 +118,7 @@ import { AppService } from './app.service';
         ChatModule,
         UploadModule,
         AiAssistantModule,
+        QueuesModule,
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', 'uploads'),
             serveRoot: '/uploads',

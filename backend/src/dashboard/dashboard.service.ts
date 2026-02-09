@@ -51,26 +51,43 @@ export class DashboardService {
             if (!isGlobalAdmin && personal) {
                 if (personal.aeropuertoId) {
                     const aeroId = personal.aeropuertoId;
-                    const aeroNombre = personal.aeropuerto?.nombre; // e.g. "SAEZ", "EZE"
-                    const aeroCodigo = personal.aeropuerto?.codigo; // e.g. "SAEZ"
+                    const aeroNombre = personal.aeropuerto?.nombre; // e.g. "Malargue"
+                    const aeroCodigo = personal.aeropuerto?.codigo; // e.g. "MLG"
 
                     this.logger.log(`🔍 Filtering for user: aeroId=${aeroId}, aeroNombre=${aeroNombre}, aeroCodigo=${aeroCodigo}`);
 
-                    // Filter VHF (via joined relation) - try both nombre and codigo
-                    if (aeroNombre || aeroCodigo) {
-                        const conditions = [];
-                        if (aeroNombre) conditions.push('vhf.aeropuerto = :aeroNombre');
-                        if (aeroCodigo) conditions.push('vhf.aeropuerto = :aeroCodigo');
+                    // Filter VHF by aeropuerto_id (foreign key) OR text matching for robustness
+                    commsQb.andWhere('(vhf.aeropuertoId = :aeroId OR vhf.aeropuerto ILIKE :aeroNombre_exact OR vhf.aeropuerto ILIKE :aeroNombre_with_accent OR vhf.aeropuerto ILIKE :aeroCodigo)', {
+                        aeroId,
+                        aeroNombre_exact: aeroNombre,
+                        aeroNombre_with_accent: aeroNombre ? aeroNombre.replace('u', 'ü').replace('U', 'Ü') : '', // Handle Malargüe
+                        aeroCodigo: `%${aeroCodigo}%`
+                    });
 
-                        commsQb.andWhere(`(${conditions.join(' OR ')})`, { aeroNombre, aeroCodigo });
-                    }
+                    // Filter Navigation with fallback
+                    navQb.andWhere('(navegacion.aeropuertoId = :aeroId OR navegacion.oaci = :aeroCodigo OR navegacion.siglasLocal = :aeroCodigo OR navegacion.nombre ILIKE :aeroNombre)', {
+                        aeroId,
+                        aeroCodigo,
+                        aeroNombre: `%${aeroNombre}%`
+                    });
 
-                    // Filter others by ID
-                    navQb.andWhere('navegacion.aeropuertoId = :aeroId', { aeroId });
-                    vigQb.andWhere('vigilancia.aeropuertoId = :aeroId', { aeroId });
-                    enerQb.andWhere('energia.aeropuertoId = :aeroId', { aeroId });
+                    // Filter Surveillance with fallback - join airport to filter by name properly
+                    vigQb.leftJoin('vigilancia.aeropuerto', 'v_aero')
+                        .andWhere('(vigilancia.aeropuertoId = :aeroId OR v_aero.nombre ILIKE :aeroNombre OR vigilancia.siglasLocal = :aeroCodigo OR vigilancia.ubicacion ILIKE :aeroNombre)', {
+                            aeroId,
+                            aeroNombre: `%${aeroNombre}%`,
+                            aeroCodigo
+                        });
+
+                    // Filter Energy with fallback - join airport to filter by name properly
+                    enerQb.leftJoin('energia.aeropuerto', 'e_aero')
+                        .andWhere('(energia.aeropuertoId = :aeroId OR e_aero.nombre ILIKE :aeroNombre OR energia.oaci = :aeroCodigo OR energia.siglasLocal = :aeroCodigo)', {
+                            aeroId,
+                            aeroNombre: `%${aeroNombre}%`,
+                            aeroCodigo
+                        });
                 } else if (personal.firId) {
-                    // Filter by FIR logic if needed (not fully implemented in CSV imports yet)
+                    // Filter by FIR logic if needed
                     this.logger.log(`🔍 Filtering by FIR: ${personal.firId}`);
                 }
             } else {

@@ -6,7 +6,7 @@ echo "========================================"
 
 # Wait for database to be ready
 echo "⏳ Waiting for PostgreSQL to be ready..."
-until wget --spider -q http://postgres:5432 2>/dev/null || nc -z postgres 5432; do
+until nc -z postgres 5432; do
   echo "   PostgreSQL is unavailable - sleeping"
   sleep 2
 done
@@ -14,7 +14,7 @@ echo "✅ PostgreSQL is ready!"
 
 # Wait for Redis to be ready
 echo "⏳ Waiting for Redis to be ready..."
-until wget --spider -q http://redis:6379 2>/dev/null || nc -z redis 6379; do
+until nc -z redis 6379; do
   echo "   Redis is unavailable - sleeping"
   sleep 2
 done

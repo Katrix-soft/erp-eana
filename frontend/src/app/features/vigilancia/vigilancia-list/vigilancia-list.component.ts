@@ -108,11 +108,20 @@ import { AiAssistantService } from '../../../core/services/ai-assistant.service'
 
             <!-- Footer Card -->
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div [ngClass]="getStatusDotClass(eq.estado)" class="w-2.5 h-2.5 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
-                <span class="text-xs font-bold tracking-widest uppercase" [ngClass]="getStatusTextClass(eq.estado)">
-                  {{ eq.estado }}
-                </span>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <div [ngClass]="getStatusDotClass(eq.estado)" class="w-2.5 h-2.5 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+                  <span class="text-xs font-bold tracking-widest uppercase" [ngClass]="getStatusTextClass(eq.estado)">
+                    {{ eq.estado }}
+                  </span>
+                </div>
+                <!-- Channel Indicator -->
+                <div class="flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                  <span class="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Canal:</span>
+                  <span class="text-[10px] font-bold" [ngClass]="eq.canalActivo === 'CH1' ? 'text-sky-400' : 'text-purple-400'">
+                    {{ eq.canalActivo || 'CH1' }}
+                  </span>
+                </div>
               </div>
               <span class="text-[10px] text-slate-600 font-mono tracking-tighter">ID: {{ eq.idApSig }}</span>
             </div>
@@ -195,6 +204,15 @@ import { AiAssistantService } from '../../../core/services/ai-assistant.service'
               <div class="space-y-1">
                 <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Siglas Local</p>
                 <p class="text-lg font-bold text-slate-200">{{ selectedEquipamiento.siglasLocal || '---' }}</p>
+              </div>
+              <div class="space-y-1">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Canal en Servicio</p>
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full" [ngClass]="selectedEquipamiento.canalActivo === 'CH1' ? 'bg-sky-400' : 'bg-purple-400'"></div>
+                  <p class="text-lg font-bold" [ngClass]="selectedEquipamiento.canalActivo === 'CH1' ? 'text-sky-400' : 'text-purple-400'">
+                    {{ selectedEquipamiento.canalActivo || 'CH1' }}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -313,13 +331,18 @@ export class VigilanciaListComponent implements OnInit {
     if (!this.selectedEquipamiento) return;
 
     this.showConfirmModal = false;
-    this.toastService.info(`Iniciando conmutación de canales para ${this.selectedEquipamiento.ubicacion}...`, 'Procesando');
+    const nuevoCanal = this.selectedEquipamiento.canalActivo === 'CH2' ? 'CH1' : 'CH2';
 
-    // Simular proceso
+    this.toastService.info(`Conmutando a ${nuevoCanal} para ${this.selectedEquipamiento.ubicacion}...`, 'Procesando');
+
+    // Simular proceso y actualizar activo
     setTimeout(() => {
-      this.toastService.success(`Conmutación completada exitosamente para ${this.selectedEquipamiento?.ubicacion}`, 'Operación Exitosa');
-      this.cdr.markForCheck();
-    }, 2000);
+      if (this.selectedEquipamiento) {
+        this.selectedEquipamiento.canalActivo = nuevoCanal;
+        this.toastService.success(`Ahora operando en ${nuevoCanal}`, 'Conmutación Exitosa');
+        this.cdr.markForCheck();
+      }
+    }, 1500);
   }
 
   verDetalles(eq: Vigilancia) {

@@ -72,7 +72,16 @@ export const routes: Routes = [
             // ----------------------------------------
             {
                 path: 'energia',
-                loadComponent: () => import('./features/energia/energia-list/energia-list.component').then(m => m.EnergiaListComponent)
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./features/energia/energia-list/energia-list.component').then(m => m.EnergiaListComponent)
+                    },
+                    {
+                        path: 'tableros/:id',
+                        loadComponent: () => import('./features/energia/tablero-detalle/tablero-detalle.component').then(m => m.TableroDetalleComponent)
+                    }
+                ]
             },
 
             // ----------------------------------------

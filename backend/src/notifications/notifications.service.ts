@@ -1,17 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Notification } from './entities/notification.entity';
 import { Personal } from '../personal/entities/personal.entity';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class NotificationsService {
+    private readonly logger = new Logger(NotificationsService.name);
+
     constructor(
         @InjectRepository(Notification) private notificationRepository: Repository<Notification>,
-        @InjectRepository(Personal) private personalRepository: Repository<Personal>
+        @InjectRepository(Personal) private personalRepository: Repository<Personal>,
+        @InjectQueue('notifications') private notificationsQueue: Queue
     ) { }
 
     async findAll(user: any) {
+        // ... (existing find logic)
         // 1. Global Admins see everything
         if (['ADMIN', 'CNS_NACIONAL'].includes(user.role)) {
             return this.notificationRepository.find({
@@ -49,19 +55,17 @@ export class NotificationsService {
 
             if (userFirId) {
                 // Notifications for the FIR itself (optionally filtered by sector)
-                // (firId matches AND (sector is null OR sector matches))
                 whereCondition += ` OR (n.firId = :userFirId AND (n.sector IS NULL OR n.sector = :userSector))`;
                 params.userFirId = userFirId;
                 params.userSector = userSector;
 
                 // Notifications for ANY airport within this FIR (optionally filtered by sector)
-                // We need to check if n.aeropuerto is in this FIR.
                 whereCondition += ` OR (aeropuerto.firId = :userFirId AND (n.sector IS NULL OR n.sector = :userSector))`;
             } else if (personal.aeropuertoId) {
                 // Notifications for specific airport
                 whereCondition += ` OR (n.aeropuertoId = :aeropuertoId AND (n.sector IS NULL OR n.sector = :userSector))`;
                 params.aeropuertoId = personal.aeropuertoId;
-                params.userSector = userSector; // Refresh if needed, same var
+                params.userSector = userSector;
             }
         }
 
@@ -71,7 +75,9 @@ export class NotificationsService {
     }
 
     async create(data: { message: string, type?: string, userId?: number, aeropuertoId?: number, firId?: number, sector?: any }) {
-        const notification = this.notificationRepository.create({
+        // Enviar a la cola para procesamiento en segundo plano
+        this.logger.log(`🔔 Queuing notification creation: ${data.message.substring(0, 30)}...`);
+        return this.notificationsQueue.add('create-notification', {
             message: data.message,
             type: data.type || 'INFO',
             userId: data.userId,
@@ -79,7 +85,6 @@ export class NotificationsService {
             firId: data.firId,
             sector: data.sector
         });
-        return this.notificationRepository.save(notification);
     }
 
     async markAsRead(id: number) {
@@ -100,3 +105,4 @@ export class NotificationsService {
         return { count: ids.length };
     }
 }
+

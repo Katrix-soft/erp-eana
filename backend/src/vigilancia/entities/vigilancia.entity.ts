@@ -64,6 +64,9 @@ export class Vigilancia {
     })
     estado: EstadoEquipo;
 
+    @Column({ name: 'canal_activo', default: 'CH1' })
+    canalActivo: string; // CH1 or CH2
+
     @ManyToOne(() => Aeropuerto)
     @JoinColumn({ name: 'aeropuerto_id' })
     aeropuerto: Aeropuerto;

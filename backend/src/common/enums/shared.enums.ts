@@ -46,3 +46,10 @@ export enum TipoChatRoom {
     SECTOR = 'SECTOR',
     EQUIPO = 'EQUIPO',
 }
+
+export enum TipoComponenteElectrico {
+    TERMICA = 'TERMICA',
+    DISYUNTOR = 'DISYUNTOR',
+    PROTECCION_SOPRE_TENSION = 'PROTECCION_SOBRE_TENSION',
+    OTRO = 'OTRO',
+}

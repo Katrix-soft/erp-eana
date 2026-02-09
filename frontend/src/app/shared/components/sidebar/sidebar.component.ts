@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { LucideAngularModule, LayoutDashboard, Radio, Server, Activity, Signal, Radar, LogOut, X, ChevronDown, ChevronRight, MessageSquare, MessageCircle, Gauge, FileText, MapPin, Users, Globe, Briefcase, Zap, Shield, Settings, History, Upload, Wrench } from 'lucide-angular';
+import { LucideAngularModule, LayoutDashboard, Radio, Server, Activity, Signal, Radar, LogOut, X, ChevronDown, ChevronRight, MessageSquare, MessageCircle, Gauge, FileText, MapPin, Users, Globe, Briefcase, Zap, Shield, Settings, History, Upload, Wrench, Wind } from 'lucide-angular';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 
@@ -47,6 +47,7 @@ export class SidebarComponent {
     readonly Wrench = Wrench;
     readonly Radar = Radar;
     readonly MessageCircle = MessageCircle;
+    readonly Wind = Wind;
 
 
     constructor() {
@@ -63,7 +64,7 @@ export class SidebarComponent {
     }
 
     isPathActive(path: string): boolean {
-        return this.currentPath.startsWith(path);
+        return this.currentPath.includes(path);
     }
 
     isAdmin(user: any): boolean {

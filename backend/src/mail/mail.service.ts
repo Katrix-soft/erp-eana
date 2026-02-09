@@ -1,34 +1,23 @@
-import { Injectable } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class MailService {
-    private transporter;
+    private readonly logger = new Logger(MailService.name);
 
-    constructor(private configService: ConfigService) {
-        // Configuración dinámica desde .env
-        this.transporter = nodemailer.createTransport({
-            host: this.configService.get<string>('MAIL_HOST') || 'smtp.office365.com',
-            port: this.configService.get<number>('MAIL_PORT') || 587,
-            secure: false, // TLS
-            auth: {
-                user: this.configService.get<string>('MAIL_USER'),
-                pass: this.configService.get<string>('MAIL_PASS'),
-            },
-            tls: {
-                ciphers: 'SSLv3',
-                rejectUnauthorized: false
-            }
-        });
-    }
+    constructor(
+        private configService: ConfigService,
+        @InjectQueue('mail') private mailQueue: Queue
+    ) { }
 
     async sendChecklistEmail(checklist: any) {
         const mailTo = this.configService.get<string>('MAIL_DESTINATION') || 'cns-nacional@eana.com.ar';
         const station = checklist.estacion || 'Desconocida';
         const date = new Date(checklist.fecha).toLocaleDateString();
 
-        console.log(`📧 Enviando Checklist #${checklist.id} a ${mailTo}`);
+        this.logger.log(`📧 Queuing Checklist email #${checklist.id} for ${mailTo}`);
 
         const mailOptions = {
             from: `"ERP EANA - Notificaciones" <${this.configService.get<string>('MAIL_USER')}>`,
@@ -59,19 +48,14 @@ export class MailService {
             `,
         };
 
-        try {
-            const info = await this.transporter.sendMail(mailOptions);
-            console.log('✅ Email enviado:', info.messageId);
-            return { success: true, messageId: info.messageId };
-        } catch (error) {
-            console.error('❌ Error enviando email:', error);
-            // No lanzamos excepción para no bloquear el flujo principal del checklist
-            return { success: false, error: error.message };
-        }
+        return this.mailQueue.add('send-checklist', { options: mailOptions }, {
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 5000 }
+        });
     }
 
     async sendPasswordResetEmail(email: string, token: string) {
-        console.log(`📧 Enviando email de recuperación a: ${email}`);
+        this.logger.log(`📧 Queuing recovery email for: ${email}`);
         const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:4200';
         const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
@@ -108,13 +92,10 @@ export class MailService {
             `,
         };
 
-        try {
-            await this.transporter.sendMail(mailOptions);
-            return { success: true };
-        } catch (error) {
-            console.error('❌ Error enviando reset email:', error);
-            return { success: false, error: error.message };
-        }
+        return this.mailQueue.add('forgot-password', { options: mailOptions }, {
+            attempts: 3,
+            priority: 1
+        });
     }
 
     async sendPasswordChangedNotification(email: string) {
@@ -125,12 +106,7 @@ export class MailService {
             text: 'Te informamos que la contraseña de tu cuenta en ERP EANA ha sido modificada recientemente.',
         };
 
-        try {
-            await this.transporter.sendMail(mailOptions);
-            return { success: true };
-        } catch (error) {
-            console.error('❌ Error enviando notificación de cambio:', error);
-            return { success: false };
-        }
+        return this.mailQueue.add('password-changed', { options: mailOptions });
     }
 }
+

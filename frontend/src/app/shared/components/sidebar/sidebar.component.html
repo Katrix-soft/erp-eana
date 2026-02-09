@@ -242,14 +242,35 @@
                                     class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
                                 <span>Radares y ADS-B</span>
                             </a>
-                            <a *ngSwitchCase="'ENERGIA'" routerLink="/energia"
-                                routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
-                                (click)="closeSidebar.emit()"
-                                class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
-                                <lucide-icon [name]="Zap" [size]="16"
-                                    class="transition-colors text-slate-500 group-hover:text-white"></lucide-icon>
-                                <span>Suministro Eléctrico</span>
-                            </a>
+                            <div *ngSwitchCase="'ENERGIA'" class="space-y-1">
+                                <a [routerLink]="['/energia']" [queryParams]="{ tipo: 'UPS' }"
+                                    routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                    (click)="closeSidebar.emit()"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                    <lucide-icon [name]="Zap" [size]="16"
+                                        [class]="isPathActive('tipo=UPS') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                        class="transition-colors"></lucide-icon>
+                                    <span>UPS</span>
+                                </a>
+                                <a [routerLink]="['/energia']" [queryParams]="{ tipo: 'AA' }"
+                                    routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                    (click)="closeSidebar.emit()"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                    <lucide-icon [name]="Wind" [size]="16"
+                                        [class]="isPathActive('tipo=AA') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                        class="transition-colors"></lucide-icon>
+                                    <span>Aire Acondicionado</span>
+                                </a>
+                                <a [routerLink]="['/energia']" [queryParams]="{ tipo: 'TABLERO' }"
+                                    routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                                    (click)="closeSidebar.emit()"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                                    <lucide-icon [name]="Settings" [size]="16"
+                                        [class]="isPathActive('tipo=TABLERO') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                        class="transition-colors"></lucide-icon>
+                                    <span>Tableros Eléctricos</span>
+                                </a>
+                            </div>
                             <!-- Add other cases like ENERGIA as needed but keeping it simple for now -->
                             <a *ngSwitchDefault routerLink="/comunicaciones"
                                 routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
@@ -338,14 +359,32 @@
                             class="px-4 py-1 text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] border-l border-slate-800">
                             Energía
                         </div>
-                        <a routerLink="/energia"
+                        <a [routerLink]="['/energia']" [queryParams]="{ tipo: 'UPS' }"
                             routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
                             (click)="closeSidebar.emit()"
                             class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
                             <lucide-icon [name]="Zap" [size]="16"
-                                [class]="isPathActive('/energia') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                [class]="isPathActive('tipo=UPS') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
                                 class="transition-colors"></lucide-icon>
-                            <span>Suministro Eléctrico</span>
+                            <span>UPS</span>
+                        </a>
+                        <a [routerLink]="['/energia']" [queryParams]="{ tipo: 'AA' }"
+                            routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                            (click)="closeSidebar.emit()"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                            <lucide-icon [name]="Wind" [size]="16"
+                                [class]="isPathActive('tipo=AA') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                class="transition-colors"></lucide-icon>
+                            <span>Aire Acondicionado</span>
+                        </a>
+                        <a [routerLink]="['/energia']" [queryParams]="{ tipo: 'TABLERO' }"
+                            routerLinkActive="bg-blue-500/10 text-blue-400 translate-x-1 border border-blue-500/20"
+                            (click)="closeSidebar.emit()"
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1">
+                            <lucide-icon [name]="Settings" [size]="16"
+                                [class]="isPathActive('tipo=TABLERO') ? 'text-blue-400' : 'text-slate-500 group-hover:text-white'"
+                                class="transition-colors"></lucide-icon>
+                            <span>Tableros Eléctricos</span>
                         </a>
                     </div>
                 </div>

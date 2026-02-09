@@ -17,6 +17,7 @@ export interface Vigilancia {
     estado: 'OK' | 'NOVEDAD' | 'FUERA_SERVICIO';
     aeropuertoId?: number;
     firId?: number;
+    canalActivo?: 'CH1' | 'CH2';
     aeropuerto?: any;
     firRel?: any;
 }

@@ -143,7 +143,8 @@ class BootstrapOrchestrator {
                 break;
             } catch (err) {
                 retryCount++;
-                Log.warn(`Database connection failed (Attempt ${retryCount}/${maxRetries}): ${err.message}`);
+                const errorMessage = err instanceof Error ? err.message : String(err);
+                Log.warn(`Database connection failed (Attempt ${retryCount}/${maxRetries}): ${errorMessage}`);
                 // Ensure client is ended if possible, though new assignment will GC it eventually
                 try { await this.db.end(); } catch (e) { }
 

@@ -28,4 +28,17 @@ export class EnergiaController {
     ) {
         return this.energiaService.updateStatus(+id, estado as any);
     }
+
+    @Get('tableros')
+    findAllTableros(
+        @Request() req: any,
+        @Query('aeropuerto') aeropuerto?: string,
+    ) {
+        return this.energiaService.findAllTableros(req.user, { aeropuerto });
+    }
+
+    @Get('tableros/:id')
+    findTablero(@Param('id') id: string) {
+        return this.energiaService.findTablero(+id);
+    }
 }
