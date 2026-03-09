@@ -1,0 +1,666 @@
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:31:11.786Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:31:11.791Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:31:11.847Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:31:11.865Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.869Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.871Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.874Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.877Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.879Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.883Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.886Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.889Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.892Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:31:11.892Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:31:15.961Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:31:16.129Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:31:16.130Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:31:16.130Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:31:16.131Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:31:16.133Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:31:16.134Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:31:16.136Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:31:18.333Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:31:18.338Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:31:18.406Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:31:18.418Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.421Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.423Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.426Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.428Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.430Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.432Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.434Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.436Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.438Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:31:18.438Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:31:22.497Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:31:22.687Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:31:22.687Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:31:22.688Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:31:22.689Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:31:22.691Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:31:22.692Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:31:22.694Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:31:25.252Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:31:25.258Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:31:25.318Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:31:25.336Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.339Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.341Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.344Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.346Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.349Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.351Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.353Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.356Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.358Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:31:25.358Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:31:30.798Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:31:30.966Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:31:30.966Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:31:30.967Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:31:30.967Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:31:30.970Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:31:30.971Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:31:30.973Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:31:33.373Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:31:33.379Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:31:33.431Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:31:33.444Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.446Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.448Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.451Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.453Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.455Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.457Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.459Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.462Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.464Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:31:33.465Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:31:37.424Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:31:37.656Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:31:37.656Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:31:37.657Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:31:37.657Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:31:37.659Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:31:37.661Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:31:37.663Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:31:39.811Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:31:39.817Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:31:39.873Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:31:39.888Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.891Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.893Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.895Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.898Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.900Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.903Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.906Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.909Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.912Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:31:39.912Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:31:43.785Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:31:43.949Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:31:43.950Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:31:43.950Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:31:43.951Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:31:43.962Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:31:43.963Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:31:43.965Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:31:46.936Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:31:46.940Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:31:46.988Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:31:47.001Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.004Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.006Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.008Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.010Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.012Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.013Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.016Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.018Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.021Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:31:47.021Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:31:50.643Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:31:50.811Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:31:50.811Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:31:50.812Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:31:50.812Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:31:50.813Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:31:50.815Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:31:50.817Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:31:55.226Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:31:55.233Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:31:55.285Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:31:55.298Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.300Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.303Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.307Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.310Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.312Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.314Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.317Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.319Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.321Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:31:55.321Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:31:59.181Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:31:59.317Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:31:59.317Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:31:59.317Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:31:59.318Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:31:59.320Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:31:59.321Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:31:59.322Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:32:07.274Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:32:07.281Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:32:07.339Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:32:07.352Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.355Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.357Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.359Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.361Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.363Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.365Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.367Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.369Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.371Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:32:07.371Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:32:11.823Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:32:12.004Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:32:12.005Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:32:12.006Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:32:12.007Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:32:12.009Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:32:12.011Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:32:12.013Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)
+🚀 EANA ERP - Starting Backend Container
+========================================
+⏳ Waiting for PostgreSQL to be ready...
+Connection to postgres (172.19.0.3) 5432 port [tcp/postgresql] succeeded!
+✅ PostgreSQL is ready!
+⏳ Waiting for Redis to be ready...
+Connection to redis (172.19.0.5) 6379 port [tcp/redis] succeeded!
+✅ Redis is ready!
+
+📦 Running Bootstrap (Database Initialization)...
+================================================
+
+> eana-backend-nest@0.0.1 bootstrap:prod
+> node dist/scripts/bootstrap.js --all
+
+[2026-02-10T13:32:26.520Z] [INFO]  🔵 Configurando conexión a DB: postgres:5432 (DB: cns_db)
+[2026-02-10T13:32:26.528Z] [INFO]  🔵 🚀 Starting Bootstrap Orchestration (ENV: PROD)...
+[2026-02-10T13:32:26.601Z] [SUCCESS] ✅ ✅ Database connected successfully.
+[2026-02-10T13:32:26.620Z] [INFO]  🔵 Skipping [migrate] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.623Z] [INFO]  🔵 Skipping [seed-basic] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.626Z] [INFO]  🔵 Skipping [seed-admin] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.628Z] [INFO]  🔵 Skipping [seed-airports] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.631Z] [INFO]  🔵 Skipping [seed-nav] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.633Z] [INFO]  🔵 Skipping [seed-chat] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.635Z] [INFO]  🔵 Skipping [seed-forum] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.637Z] [INFO]  🔵 Skipping [update-freq] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.639Z] [INFO]  🔵 Skipping [import-csv] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.641Z] [INFO]  🔵 Skipping [verify] - already executed. Use --force to rerun.
+[2026-02-10T13:32:26.642Z] [SUCCESS] ✅ 🎉 Full Bootstrap process completed successfully.
+
+✅ Bootstrap completed successfully!
+
+🎯 Starting NestJS Application...
+==================================
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+DEBUG ENV: { HOST: 'postgres', PORT: '5432', DB: 'cns_db' }
+2026-02-10T13:32:31.325Z [LOG] [NestFactory] Starting Nest application...
+2026-02-10T13:32:31.463Z [LOG] [InstanceLoader] TypeOrmModule dependencies initialized
+2026-02-10T13:32:31.464Z [LOG] [InstanceLoader] PassportModule dependencies initialized
+2026-02-10T13:32:31.464Z [LOG] [InstanceLoader] CommonModule dependencies initialized
+2026-02-10T13:32:31.464Z [LOG] [InstanceLoader] MulterModule dependencies initialized
+2026-02-10T13:32:31.474Z [LOG] [InstanceLoader] ThrottlerModule dependencies initialized
+2026-02-10T13:32:31.476Z [LOG] [InstanceLoader] ConfigHostModule dependencies initialized
+2026-02-10T13:32:31.478Z [ERROR] [ExceptionHandler] Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+
+Stack: Error: Nest can't resolve dependencies of the NotificationProcessor (?). Please make sure that the argument "NotificationRepository" at index [0] is available in the QueuesModule context.
+
+Potential solutions:
+- Is QueuesModule a valid NestJS module?
+- If "NotificationRepository" is a provider, is it part of the current QueuesModule?
+- If "NotificationRepository" is exported from a separate @Module, is that module imported within QueuesModule?
+  @Module({
+    imports: [ /* the Module containing "NotificationRepository" */ ]
+  })
+
+    at Injector.lookupComponentInParentModules (/app/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Injector.resolveComponentInstance (/app/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at async resolveParam (/app/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at async Injector.resolveConstructorParams (/app/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at async Injector.loadInstance (/app/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at async Injector.loadProvider (/app/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at async /app/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 5)

@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { LucideAngularModule, User, Mail, Shield, MapPin, LogOut, Lock, Eye, EyeOff, Save, X, Edit } from 'lucide-angular';
+import { LucideAngularModule, User, Mail, Shield, MapPin, LogOut, Lock, Eye, EyeOff, Save, X, Edit, Fingerprint, CheckCircle, Trash2 } from 'lucide-angular';
 
 interface UserProfile {
   id: number;
@@ -62,11 +62,23 @@ export class ProfileComponent implements OnInit {
   readonly X = X;
   readonly Edit = Edit;
   readonly User = User;
+  readonly Fingerprint = Fingerprint;
+  readonly CheckCircle = CheckCircle;
+  readonly Trash2 = Trash2;
+
+  // Biométrico
+  hasPasskey = false;
+  passkeyCount = 0;
+  biometricLoading = false;
+  biometricMessage = '';
+  biometricError = '';
+  biometricAvailable = false;
 
   ngOnInit() {
     this.initForms();
     this.loadInitialData();
     this.loadProfile();
+    this.checkBiometricStatus();
   }
 
   initForms() {
@@ -210,5 +222,72 @@ export class ProfileComponent implements OnInit {
       'TECNICO': 'Técnico'
     };
     return labels[role] || role;
+  }
+
+  // ══════════════════════════════════════════
+  // MéTODOS BIOMéTRICOS
+  // ══════════════════════════════════════════
+
+  private async checkBiometricStatus() {
+    // Verificar soporte hardware
+    if (window.PublicKeyCredential) {
+      this.biometricAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    }
+
+    // Verificar si el usuario ya tiene registrado un passkey
+    const userId = this.authService.userValue?.id;
+    if (userId) {
+      this.authService.checkPasskeyStatus(userId).subscribe({
+        next: (res) => {
+          this.hasPasskey = res.hasPasskey;
+          this.passkeyCount = res.count;
+        }
+      });
+    }
+  }
+
+  registerPasskey() {
+    this.biometricLoading = true;
+    this.biometricMessage = '';
+    this.biometricError = '';
+
+    this.authService.registerPasskey().subscribe({
+      next: (res) => {
+        this.biometricLoading = false;
+        this.biometricMessage = res.message || 'Biométrico registrado exitosamente.';
+        this.hasPasskey = true;
+        this.passkeyCount++;
+        setTimeout(() => this.biometricMessage = '', 5000);
+      },
+      error: (err) => {
+        this.biometricLoading = false;
+        if (err.name === 'NotAllowedError') {
+          this.biometricError = 'Registro cancelado o tiempo agotado.';
+        } else {
+          this.biometricError = err.error?.message || 'Error al registrar el biométrico.';
+        }
+        setTimeout(() => this.biometricError = '', 5000);
+      }
+    });
+  }
+
+  removePasskeys() {
+    if (!confirm('¿Está seguro que desea eliminar todos los dispositivos biométricos registrados?')) return;
+
+    this.biometricLoading = true;
+    this.authService.removePasskeys().subscribe({
+      next: () => {
+        this.biometricLoading = false;
+        this.biometricMessage = 'Dispositivos biométricos eliminados correctamente.';
+        this.hasPasskey = false;
+        this.passkeyCount = 0;
+        setTimeout(() => this.biometricMessage = '', 4000);
+      },
+      error: (err) => {
+        this.biometricLoading = false;
+        this.biometricError = err.error?.message || 'Error al eliminar los biométricos.';
+        setTimeout(() => this.biometricError = '', 5000);
+      }
+    });
   }
 }

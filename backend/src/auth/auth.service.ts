@@ -396,4 +396,42 @@ export class AuthService {
     async checkDefaultPasswordStatus(identifier: string) {
         return { showHint: false };
     }
+
+    /**
+     * Resolver userId desde email o username (para flujo biométrico)
+     * No devuelve información sensible, solo el ID público
+     */
+    async resolveUserIdFromIdentifier(identifier: string): Promise<{ userId: number | null }> {
+        const normalized = identifier.trim().toLowerCase();
+        let user: User | null = null;
+
+        try {
+            if (normalized.includes('@')) {
+                user = await this.userRepository.findOne({
+                    where: { email: normalized },
+                    select: ['id']
+                });
+            } else if (/^\d+$/.test(normalized)) {
+                // DNI: buscar personal y luego usuario
+                const personal = await this.personalRepository.findOne({
+                    where: { dni: normalized },
+                    relations: ['user'],
+                    select: ['id', 'user']
+                });
+                if (personal?.user) {
+                    return { userId: personal.user.id };
+                }
+            } else {
+                // Username (prefijo del email)
+                user = await this.userRepository.createQueryBuilder('user')
+                    .select(['user.id'])
+                    .where('user.email LIKE :emailPrefix', { emailPrefix: `${normalized}@%` })
+                    .getOne();
+            }
+        } catch {
+            return { userId: null };
+        }
+
+        return { userId: user?.id ?? null };
+    }
 }

@@ -80,15 +80,15 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
             </div>
           </div>
 
-          <div class="bg-slate-900/50 border border-white/5 rounded-3xl p-6 flex flex-col justify-between group hover:border-yellow-500/30 transition-all duration-300">
+          <div class="bg-slate-900/50 border border-white/5 rounded-3xl p-6 flex flex-col justify-between group hover:border-blue-500/30 transition-all duration-300">
             <div class="flex justify-between items-start">
-                <div class="p-3 bg-yellow-500/10 rounded-2xl text-yellow-400 group-hover:scale-110 transition-transform">
-                    <lucide-icon [name]="Activity" [size]="24"></lucide-icon>
+                <div class="p-3 bg-blue-500/10 rounded-2xl text-blue-400 group-hover:scale-110 transition-transform">
+                    <lucide-icon [name]="Box" [size]="24"></lucide-icon>
                 </div>
             </div>
             <div class="mt-4">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Protección Sobretensión</p>
-                <p class="text-3xl font-black text-white">{{ getCountByType('PROTECCION_SOBRE_TENSION') }}</p>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Estructura Física</p>
+                <p class="text-3xl font-black text-white">{{ getRails().length }} Gabinetes</p>
             </div>
           </div>
         </div>
@@ -106,6 +106,12 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
                 
                 <div class="flex items-center gap-2 bg-slate-950/50 p-1.5 rounded-2xl border border-white/5">
                     <button 
+                        (click)="viewMode = 'physical'"
+                        [class]="viewMode === 'physical' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'"
+                        class="p-2.5 rounded-xl transition-all duration-300">
+                        <lucide-icon [name]="Box" [size]="18"></lucide-icon>
+                    </button>
+                    <button 
                         (click)="viewMode = 'grid'"
                         [class]="viewMode === 'grid' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'"
                         class="p-2.5 rounded-xl transition-all duration-300">
@@ -121,6 +127,71 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
             </div>
 
             <div class="p-8">
+                <!-- PHYSICAL CABINET VIEW -->
+                <div *ngIf="viewMode === 'physical'" class="space-y-12 animate-in fade-in duration-500">
+                    <div class="relative max-w-4xl mx-auto">
+                        <!-- Cabinet Frame -->
+                        <div class="bg-gray-300 rounded-[2rem] p-4 shadow-2xl border-4 border-gray-400 relative">
+                            <!-- Cabinet Door Handle -->
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-16 bg-gray-500 rounded-full border border-gray-600 shadow-inner"></div>
+                            
+                            <!-- Interior / DIN Rails -->
+                            <div class="bg-slate-800 rounded-[1.5rem] p-8 space-y-12 min-h-[500px] border-inner shadow-2xl border-2 border-slate-900">
+                                
+                                <!-- Loop through groupings (simulation of Rails) -->
+                                <div *ngFor="let rail of getRails(); let i = index" class="relative">
+                                    <div class="absolute -top-6 left-0 text-[10px] font-black text-slate-500 uppercase tracking-widest">RIEL DIN #{{ i + 1 }}</div>
+                                    <!-- The physical Rail -->
+                                    <div class="h-4 bg-slate-700 w-full absolute top-[60px] translate-y-[-50%] shadow-inner border-y border-slate-600 opacity-50"></div>
+                                    
+                                    <!-- Components on this rail -->
+                                    <div class="flex flex-wrap gap-1 relative z-10 items-end justify-center">
+                                        <div *ngFor="let comp of rail" 
+                                            [style.width.px]="(comp.polos || 1) * 35"
+                                            class="bg-white rounded-t-lg border-x-2 border-t-2 border-gray-200 flex flex-col items-center justify-between pb-2 shadow-lg group hover:scale-105 transition-transform cursor-pointer overflow-hidden"
+                                            [title]="comp.nombre">
+                                            
+                                            <!-- Top label -->
+                                            <div class="w-full bg-slate-100 border-b border-gray-200 py-1 text-center">
+                                                <span class="text-[8px] font-black text-slate-400">{{ comp.nombre }}</span>
+                                            </div>
+
+                                            <!-- Component body -->
+                                            <div class="flex-1 w-full p-2 flex flex-col items-center justify-center gap-1">
+                                                <div [ngClass]="getCompIconBgClass(comp.tipo)" class="p-1.5 rounded-lg scale-75">
+                                                    <lucide-icon [name]="getCompIcon(comp.tipo)" [size]="12"></lucide-icon>
+                                                </div>
+                                                <div class="h-8 w-1 bg-gray-300 rounded-full group-hover:bg-blue-500 transition-colors"></div>
+                                            </div>
+
+                                            <!-- Amperage -->
+                                            <span class="text-[9px] font-black text-slate-600 bg-gray-50 px-2 rounded border border-gray-200 mb-1">
+                                                {{ comp.amperaje || 'N/A' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Empty rails if few components -->
+                                <div *ngIf="getRails().length < 2" class="relative opacity-20 h-32 border-2 border-dashed border-slate-700 rounded-2xl flex items-center justify-center">
+                                    <span class="text-slate-600 text-[10px] font-black tracking-[0.3em] uppercase">RIEL DE RESERVA</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Location Callout -->
+                        <div class="absolute -right-12 -top-12 bg-blue-600 p-4 rounded-3xl shadow-xl border-4 border-slate-950 max-w-[200px] animate-bounce">
+                            <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-1">Ubicación Precisa</p>
+                            <p class="text-white font-bold leading-tight">{{ tablero.ubicacion }}</p>
+                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-blue-600 rotate-45"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center text-slate-500 max-w-md mx-auto">
+                        <p class="text-xs italic">Vista técnica del gabinete estructural. Las dimensiones de los componentes están basadas en polos DIN estándares.</p>
+                    </div>
+                </div>
+
                 <!-- GRID VIEW -->
                 <div *ngIf="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <div *ngFor="let comp of tablero.componentes" 
@@ -214,7 +285,19 @@ export class TableroDetalleComponent implements OnInit {
 
     tablero: TableroElectrico | null = null;
     loading = true;
-    viewMode: 'grid' | 'list' = 'grid';
+    viewMode: 'grid' | 'list' | 'physical' = 'physical';
+
+    getRails(): ComponenteTablero[][] {
+        if (!this.tablero?.componentes) return [];
+        const rails: ComponenteTablero[][] = [];
+        const components = [...this.tablero.componentes];
+        const itemsPerRail = 12; // Standard DIN rail capacity simulation
+
+        for (let i = 0; i < components.length; i += itemsPerRail) {
+            rails.push(components.slice(i, i + itemsPerRail));
+        }
+        return rails;
+    }
 
     // Icons
     readonly ChevronLeft = ChevronLeft;

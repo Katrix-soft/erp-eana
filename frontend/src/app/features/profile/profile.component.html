@@ -255,6 +255,76 @@
                     </form>
                 </div>
             </div>
+
+            <!-- ══════════════════════════════════════════ -->
+            <!-- SECCIÓN BIOMÉTRICA                           -->
+            <!-- ══════════════════════════════════════════ -->
+            <div *ngIf="biometricAvailable"
+                class="glass-panel p-8 rounded-[2rem] space-y-8 lg:col-span-2 slide-in-from-bottom-6">
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <div class="p-2 bg-cyan-500/20 rounded-xl text-cyan-400">
+                            <lucide-icon [name]="Fingerprint" [size]="22"></lucide-icon>
+                        </div>
+                        Inicio de Sesión Biométrico
+                    </h2>
+                    <p class="text-slate-400 text-sm">
+                        Configure el inicio de sesión sin contraseña utilizando su huella dactilar, Face ID o Windows
+                        Hello.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="glass-card p-6 border-white/5 space-y-4">
+                        <div
+                            class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/10 flex items-center justify-center text-cyan-400 mb-4 mx-auto md:mx-0">
+                            <lucide-icon [name]="hasPasskey ? CheckCircle : Fingerprint" [size]="32"
+                                [class.text-emerald-400]="hasPasskey"></lucide-icon>
+                        </div>
+
+                        <div class="text-center md:text-left">
+                            <h3 class="text-xl font-bold text-white mb-2">Estado Biométrico</h3>
+                            <p class="text-slate-400 text-sm mb-4">
+                                <span *ngIf="hasPasskey"
+                                    class="text-emerald-400 font-semibold inline-flex items-center gap-1.5">
+                                    <lucide-icon [name]="CheckCircle" [size]="16"></lucide-icon>
+                                    {{ passkeyCount }} dispositivo(s) registrado(s)
+                                </span>
+                                <span *ngIf="!hasPasskey" class="text-amber-400 font-semibold">
+                                    No hay dispositivos registrados
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <button (click)="registerPasskey()" [disabled]="biometricLoading"
+                            class="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-50">
+                            <lucide-icon [name]="Fingerprint" [size]="20"
+                                class="group-hover:scale-110 transition-transform"></lucide-icon>
+                            {{ biometricLoading ? 'Procesando...' : 'Registrar Nuevo Dispositivo' }}
+                        </button>
+
+                        <button *ngIf="hasPasskey" (click)="removePasskeys()" [disabled]="biometricLoading"
+                            class="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 font-semibold rounded-xl border border-red-500/20 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50">
+                            <lucide-icon [name]="Trash2" [size]="18"></lucide-icon>
+                            Eliminar Biométricos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensajes biométricos -->
+                <div *ngIf="biometricMessage"
+                    class="p-4 bg-emerald-500/20 border border-emerald-500/30 rounded-xl text-emerald-300 text-sm flex items-center gap-3 animate-fade-in">
+                    <lucide-icon [name]="CheckCircle" [size]="18"></lucide-icon>
+                    {{ biometricMessage }}
+                </div>
+                <div *ngIf="biometricError"
+                    class="p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-center gap-3 animate-fade-in">
+                    <lucide-icon [name]="X" [size]="18"></lucide-icon>
+                    {{ biometricError }}
+                </div>
+            </div>
         </div>
     </div>
 </div>

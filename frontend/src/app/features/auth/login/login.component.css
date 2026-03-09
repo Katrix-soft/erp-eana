@@ -1,5 +1,6 @@
 /* CSS for login component */
 
+/* Animación shake para error */
 @keyframes shake {
 
     0%,
@@ -27,6 +28,7 @@
     animation: shake 0.5s ease-in-out;
 }
 
+/* Animación fade-in */
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -41,4 +43,132 @@
 
 .animate-fade-in {
     animation: fade-in 0.3s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/* BOTÓN BIOMÉTRICO - Diseño premium glassmorphism        */
+/* ═══════════════════════════════════════════════════════ */
+
+.biometric-btn {
+    background: linear-gradient(135deg,
+            rgba(6, 182, 212, 0.08) 0%,
+            rgba(14, 165, 233, 0.05) 50%,
+            rgba(6, 182, 212, 0.08) 100%);
+    border: 1.5px solid rgba(6, 182, 212, 0.25);
+    color: #334155;
+    box-shadow:
+        0 2px 8px rgba(6, 182, 212, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+}
+
+.biometric-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+            rgba(6, 182, 212, 0.15),
+            rgba(14, 165, 233, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.biometric-btn:hover:not(:disabled)::before {
+    opacity: 1;
+}
+
+.biometric-btn:hover:not(:disabled) {
+    border-color: rgba(6, 182, 212, 0.5);
+    box-shadow:
+        0 4px 16px rgba(6, 182, 212, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform: translateY(-1px);
+}
+
+.biometric-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.biometric-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(14, 165, 233, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/* ANILLO ANIMADO DEL BIOMÉTRICO (overlay de carga)       */
+/* ═══════════════════════════════════════════════════════ */
+
+.fingerprint-ring {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fingerprint-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: rgba(6, 182, 212, 0.1);
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    animation: biometric-pulse 2s ease-in-out infinite;
+}
+
+.fingerprint-circle::before,
+.fingerprint-circle::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(6, 182, 212, 0.4);
+    animation: biometric-expand 2s ease-out infinite;
+}
+
+.fingerprint-circle::before {
+    width: 120px;
+    height: 120px;
+    animation-delay: 0s;
+}
+
+.fingerprint-circle::after {
+    width: 140px;
+    height: 140px;
+    animation-delay: 0.5s;
+}
+
+@keyframes biometric-pulse {
+
+    0%,
+    100% {
+        background: rgba(6, 182, 212, 0.1);
+        box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.3);
+    }
+
+    50% {
+        background: rgba(6, 182, 212, 0.2);
+        box-shadow: 0 0 20px 5px rgba(6, 182, 212, 0.2);
+    }
+}
+
+@keyframes biometric-expand {
+    0% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.4);
+    }
 }

@@ -330,23 +330,30 @@ export class EnergiaListComponent implements OnInit {
       }
 
       if (this.currentTipo?.toUpperCase() === 'TABLERO') {
+        console.log('📡 Fetching tableros with filters:', filters);
         this.energiaService.getTableros(filters).subscribe({
           next: (data) => {
+            console.log('✅ Received tableros:', data);
             // Mapeamos TableroElectrico a Energia para que la lista lo renderice
-            this.equipamientos = data.map(t => ({
+            const mapped = data.map(t => ({
               id: t.id,
-              referencia: t.nombre,
-              ubicacion: t.ubicacion,
-              estado: t.estado,
+              referencia: t.nombre || 'Tablero Sin Nombre',
+              ubicacion: t.ubicacion || 'No especificada',
+              estado: t.estado || 'OK',
               tipo: 'TABLERO',
               grupo: 'TABLERO',
               aeropuerto: t.aeropuerto
             } as Energia));
+
+            console.log('🎯 Mapped tableros:', mapped);
+            this.allEquipamientos = mapped;
+            this.equipamientos = mapped;
             this.loading = false;
             this.cdr.markForCheck();
+            this.cdr.detectChanges();
           },
           error: (err) => {
-            console.error('Error loading tableros:', err);
+            console.error('❌ Error loading tableros:', err);
             this.loading = false;
             this.cdr.markForCheck();
           }

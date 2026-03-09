@@ -143,7 +143,8 @@ export class ChatService {
             return;
         }
 
-        this.socket = io(`${environment.socketUrl}/chat`, {
+        // Usar ruta relativa para soportar ngrok sin restricciones CORS de Localhost
+        this.socket = io('/chat', {
             path: '/socket.io/',
             transports: ['polling', 'websocket'], // Allow polling for faster initial connection
             autoConnect: true,

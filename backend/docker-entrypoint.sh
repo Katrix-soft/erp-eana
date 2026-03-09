@@ -37,6 +37,6 @@ else
 fi
 
 # Start the main application
-echo "🎯 Starting NestJS Application..."
+echo "🎯 Starting NestJS Application (Optimized)..."
 echo "=================================="
-exec node dist/main.js
+exec node --max-old-space-size=256 --optimize-for-size --gc-interval=100 dist/main.js

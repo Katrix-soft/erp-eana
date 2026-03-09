@@ -76,16 +76,26 @@ export class EnergiaService {
 
     // --- Métodos para Tableros Eléctricos ---
 
-    async findAllTableros(user: any, filters?: { aeropuerto?: string }) {
+    async findAllTableros(user: any, filters?: { aeropuerto?: string, fir?: string }) {
+        this.logger.log(`🔍 Buscando tableros - User: ${user.email} (Role: ${user.role}) - Filters: ${JSON.stringify(filters)}`);
+
         const userId = Number(user.userId || user.sub);
-        const isGlobalAdmin = ['ADMIN', 'CNS_NACIONAL'].includes(user.role);
+        const isGlobalAdmin = ['ADMIN', 'CNS_NACIONAL', 'JEFE_COORDINADOR'].includes(user.role);
 
         const qb = this.tableroRepository.createQueryBuilder('tablero')
             .leftJoinAndSelect('tablero.aeropuerto', 'aeropuerto')
+            .leftJoinAndSelect('aeropuerto.fir', 'fir_rel')
             .leftJoinAndSelect('tablero.componentes', 'componentes')
             .orderBy('tablero.nombre', 'ASC');
 
-        if (!isGlobalAdmin) {
+        if (filters?.aeropuerto) {
+            qb.andWhere(new Brackets(qb2 => {
+                qb2.where('aeropuerto.codigo ILIKE :apt', { apt: filters.aeropuerto })
+                    .orWhere('aeropuerto.nombre ILIKE :aptName', { aptName: `%${filters.aeropuerto}%` });
+            }));
+        } else if (filters?.fir) {
+            qb.andWhere('fir_rel.codigo ILIKE :firCode', { firCode: filters.fir });
+        } else if (!isGlobalAdmin) {
             const personal = await this.personalRepository.findOne({
                 where: { userId: userId },
                 relations: ['aeropuerto']
@@ -96,11 +106,11 @@ export class EnergiaService {
             } else {
                 return [];
             }
-        } else if (filters?.aeropuerto) {
-            qb.andWhere('aeropuerto.codigo ILIKE :apt', { apt: filters.aeropuerto });
         }
 
-        return qb.getMany();
+        const items = await qb.getMany();
+        this.logger.log(`✅ Encontrados ${items.length} tableros`);
+        return items;
     }
 
     async findTablero(id: number) {

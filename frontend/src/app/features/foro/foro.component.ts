@@ -11,7 +11,7 @@ import { ToastContainerComponent } from '../../shared/components/toast-container
 @Component({
     selector: 'app-foro',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, ToastContainerComponent],
+    imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './foro.component.html',
     styleUrls: ['./foro.component.css']
 })

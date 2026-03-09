@@ -83,9 +83,17 @@ import { AppService } from './app.service';
                     entities: [__dirname + '/**/*.entity{.ts,.js}'],
                     synchronize: true,
                     logging: config.get<string>('NODE_ENV') !== 'production',
-                    poolSize: 10,
-                    // Cache deshabilitado por ahora
-                    cache: false,
+                    poolSize: parseInt(config.get<string>('DB_POOL_SIZE', '5')), // Reducido el pool para modo low-RAM (900mb)
+                    cache: cacheEnabled ? {
+                        type: 'redis',
+                        options: {
+                            socket: {
+                                host: config.get<string>('REDIS_HOST', 'redis'),
+                                port: config.get<number>('REDIS_PORT', 6379),
+                            },
+                        },
+                        duration: 30000, // 30 segundos
+                    } : false,
                 };
             },
         }),

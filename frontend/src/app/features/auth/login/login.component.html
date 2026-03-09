@@ -18,6 +18,25 @@
   </div>
 </div>
 
+<!-- Biometric Loading Overlay -->
+<div *ngIf="isBiometricLoading"
+  class="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 flex items-center justify-center">
+  <div class="text-center max-w-sm mx-auto px-6">
+    <div class="fingerprint-ring mb-8">
+      <div class="fingerprint-circle">
+        <lucide-icon [name]="Fingerprint" [size]="52" class="text-cyan-400"></lucide-icon>
+      </div>
+    </div>
+    <h2 class="text-2xl font-bold text-white mb-3">Verificando identidad</h2>
+    <p class="text-cyan-200 text-base">Use su huella dactilar o Face ID en el sensor de su dispositivo...</p>
+    <div class="mt-6 flex justify-center gap-2">
+      <div class="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+      <div class="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+      <div class="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Error Screen Overlay -->
 <div *ngIf="showErrorScreen"
   class="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -72,8 +91,7 @@
   <!-- Background Image -->
   <div class="absolute inset-0 bg-[url('/src/assets/foto-eana.avif')] bg-cover bg-center"></div>
 
-
-  <!-- Gradient Overlay - Reduced opacity to show airplane better -->
+  <!-- Gradient Overlay -->
   <div class="absolute inset-0 bg-gradient-to-br from-slate-900/60 via-blue-900/50 to-slate-900/60"></div>
 
   <!-- Decorative circles -->
@@ -99,7 +117,7 @@
       <!-- Right Side - Login Form -->
       <div class="w-full">
         <div class="bg-white/50 backdrop-blur-md rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/30">
-          <!-- Logo for mobile and form header -->
+          <!-- Logo for mobile -->
           <div class="flex justify-center mb-6 lg:hidden">
             <img src="/src/assets/logo_atsep.png" alt="EANA Logo" class="w-24 h-24 object-contain" />
           </div>
@@ -139,13 +157,64 @@
               </p>
             </div>
 
-            <button type="submit" [disabled]="isLoading || loginForm.invalid"
+            <button type="submit" [disabled]="isLoading || loginForm.invalid" id="btn-login-password"
               class="w-full py-3.5 bg-slate-900 text-white font-semibold rounded-xl shadow-lg hover:bg-slate-800 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-70">
               {{ isLoading ? 'Ingresando...' : 'Ingresar' }}
               <lucide-icon *ngIf="!isLoading" [name]="ShieldCheck" [size]="18"
                 class="group-hover:text-blue-400 transition-colors"></lucide-icon>
             </button>
           </form>
+
+          <!-- ═══════════════════════════════════════════ -->
+          <!-- SECCIÓN BIOMÉTRICA                         -->
+          <!-- ═══════════════════════════════════════════ -->
+          <div *ngIf="biometricAvailable" class="mt-6">
+            <!-- Separador -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex-1 h-px bg-slate-200"></div>
+              <span class="text-xs text-slate-400 font-medium whitespace-nowrap">o usar biométrico</span>
+              <div class="flex-1 h-px bg-slate-200"></div>
+            </div>
+
+            <!-- Botón Biométrico -->
+            <button (click)="loginWithBiometric()" [disabled]="isBiometricLoading" id="btn-biometric-login"
+              class="biometric-btn w-full py-3.5 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-not-allowed">
+              <div class="biometric-icon-wrapper">
+                <lucide-icon [name]="Fingerprint" [size]="22"
+                  class="text-cyan-600 group-hover:text-cyan-700 transition-colors"></lucide-icon>
+              </div>
+              <span class="text-slate-700 group-hover:text-slate-900">
+                {{ isBiometricLoading ? 'Esperando biométrico...' : 'Iniciar sesión con huella / Face ID' }}
+              </span>
+            </button>
+
+            <!-- Error biométrico -->
+            <div *ngIf="biometricError" class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg animate-fade-in">
+              <p class="text-amber-700 text-xs leading-relaxed">⚠️ {{ biometricError }}</p>
+            </div>
+
+            <!-- Info si no tiene passkey registrado -->
+            <p class="text-center text-xs text-slate-400 mt-3">
+              🔐 Registre su biométrico desde <strong>Perfil → Seguridad</strong> después de iniciar sesión
+            </p>
+          </div>
+
+          <!-- No hay soporte biométrico -->
+          <div *ngIf="!biometricAvailable" class="mt-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex-1 h-px bg-slate-200"></div>
+              <span class="text-xs text-slate-400 font-medium whitespace-nowrap">biométrico</span>
+              <div class="flex-1 h-px bg-slate-200"></div>
+            </div>
+            <div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <lucide-icon [name]="Fingerprint" [size]="20" class="text-slate-300 mx-auto mb-1"></lucide-icon>
+              <p class="text-xs text-slate-400">
+                Este dispositivo no permite usar el sensor biométrico.<br />
+                <strong class="text-slate-500 mt-1 inline-block">Motivo:</strong> {{ biometricSupportReason || 'No
+                soportado' }}
+              </p>
+            </div>
+          </div>
 
           <div class="text-center mt-6">
             <a routerLink="/forgot-password"
@@ -154,7 +223,7 @@
             </a>
           </div>
 
-          <div class="mt-10 text-center text-xs text-slate-400">
+          <div class="mt-8 text-center text-xs text-slate-400">
             &copy; 2025 CNS/EANA. Todos los derechos reservados.
           </div>
         </div>

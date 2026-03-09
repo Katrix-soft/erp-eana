@@ -6,7 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, of, interval, Subscription } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
-import { LucideAngularModule, Radio, Server, Activity, Zap, MapPin, RefreshCw, PlusCircle, Users, LayoutDashboard, CheckCircle, AlertTriangle, Info, History, ChevronRight } from 'lucide-angular';
+import { LucideAngularModule, Radio, Server, Activity, Zap, MapPin, RefreshCw, PlusCircle, Users, LayoutDashboard, CheckCircle, AlertTriangle, Info, History, ChevronRight, Fingerprint, X } from 'lucide-angular';
 import { Router, RouterModule } from '@angular/router';
 import { CnsMapComponent } from '../../shared/components/cns-map/cns-map.component';
 
@@ -66,8 +66,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     readonly Info = Info;
     readonly History = History;
     readonly ChevronRight = ChevronRight;
+    readonly Fingerprint = Fingerprint;
+    readonly X = X;
 
     showStrategicMap = false;
+
+    // Biometric prompt state
+    showBiometricPrompt = false;
+    isRegisteringBiometric = false;
+    biometricError = '';
 
     ngOnInit() {
         console.log('💎💎💎 VERSIÓN ACTUALIZADA DEL DASHBOARD (SIN FILTROS MANUALES) 💎💎💎');
@@ -80,6 +87,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
                 this.loadData();
                 this.setupAutoRefresh();
+
+                // Check biometric registration periodically or on load
+                if (user.id) {
+                    this.checkBiometricReminder(user.id);
+                }
             }
         });
     }
@@ -170,5 +182,62 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     navigateToAirport(apt: string) {
         this.router.navigate(['/comunicaciones'], { queryParams: { aeropuerto: apt } });
+    }
+
+    private async checkBiometricReminder(userId: number) {
+        if (typeof window === 'undefined') return;
+
+        // Skip if user dismissed the prompt before
+        const dismissed = localStorage.getItem(`biometricPromptDismissed_${userId}`);
+        if (dismissed === 'true') return;
+
+        try {
+            // Check if device supports platform authenticators
+            if (window.PublicKeyCredential) {
+                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!available) return;
+            } else {
+                return;
+            }
+
+            // Check if user already has a passkey
+            const status = await this.authService.checkPasskeyStatus(userId).toPromise();
+            if (status && !status.hasPasskey) {
+                this.showBiometricPrompt = true;
+                this.cdr.detectChanges();
+            }
+        } catch (e) {
+            console.error('Error checking biometric status', e);
+        }
+    }
+
+    dismissBiometricPrompt() {
+        this.showBiometricPrompt = false;
+        const user = this.authService.userValue;
+        if (user?.id) {
+            localStorage.setItem(`biometricPromptDismissed_${user.id}`, 'true');
+        }
+    }
+
+    registerBiometric() {
+        this.isRegisteringBiometric = true;
+        this.biometricError = '';
+        this.authService.registerPasskey().subscribe({
+            next: (res) => {
+                this.isRegisteringBiometric = false;
+                this.showBiometricPrompt = false;
+                alert('Biométrico activado con éxito. Ahora podrá iniciar sesión usando su huella o Face ID.');
+                const user = this.authService.userValue;
+                if (user?.id) {
+                    localStorage.setItem(`biometricPromptDismissed_${user.id}`, 'true');
+                }
+            },
+            error: (err) => {
+                this.isRegisteringBiometric = false;
+                this.biometricError = err.error?.message || 'Error al registrar biométrico. Intente nuevamente.';
+                console.error(err);
+                this.cdr.detectChanges();
+            }
+        });
     }
 }
